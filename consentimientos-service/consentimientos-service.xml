@@ -3,28 +3,8 @@
   <configuration>
     <configItems>
       <config-item>
-        <name>org.kie.server.location</name>
-        <value>http://localhost:8090/rest/server</value>
-        <type>java.lang.String</type>
-      </config-item>
-      <config-item>
-        <name>org.kie.server.sb.cfg.cxf.path</name>
-        <value>/rest</value>
-        <type>java.lang.String</type>
-      </config-item>
-      <config-item>
         <name>org.kie.server.user</name>
         <value>consentimientos</value>
-        <type>java.lang.String</type>
-      </config-item>
-      <config-item>
-        <name>org.kie.server.id</name>
-        <value>consentimientos-service</value>
-        <type>java.lang.String</type>
-      </config-item>
-      <config-item>
-        <name>org.kie.server.controller</name>
-        <value></value>
         <type>java.lang.String</type>
       </config-item>
       <config-item>
@@ -35,6 +15,26 @@
       <config-item>
         <name>org.kie.server.pwd</name>
         <value>consentimientos</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.location</name>
+        <value>http://localhost:8090/rest/server</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.sb.cfg.cxf.path</name>
+        <value>/rest</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.id</name>
+        <value>consentimientos-service</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.controller</name>
+        <value></value>
         <type>java.lang.String</type>
       </config-item>
     </configItems>

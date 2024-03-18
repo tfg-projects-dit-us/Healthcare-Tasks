@@ -73,7 +73,7 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<Questionnai
 						.setType(it.getType())
 						.addAnswerOption().setValue(item.getAnswer().get(0).getValue());
 					break;
-				case CHOICE:
+				case CODING:
 					questionnaire.addItem()
 						.setLinkId(item.getLinkId())
 						.setText(item.getText())
@@ -152,7 +152,7 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<Questionnai
 							.addAnswerOption().setValue(item1.getAnswer().get(0).getValue());
 						example.add(t);
 						break;
-					case CHOICE:
+					case CODING:
 						t.setLinkId(item1.getLinkId())
 							.setText(item1.getText())
 							.setType(it1.getType())

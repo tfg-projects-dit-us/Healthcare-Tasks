@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
-import jdk.internal.org.jline.utils.Log;
 import us.dit.consentimientos.service.services.fhir.FhirClient;
 import us.dit.consentimientos.service.services.mapper.MapToQuestionnaireResponse;
 

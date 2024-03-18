@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background-color: rgb(241, 225, 16);
+  background-color: rgb(241, 241, 241);
 }
 .table{
   margin: 0;
@@ -12,12 +12,13 @@ body {
 }
 .topnav {
   overflow: hidden;
-  background-color: rgb(140, 16, 16);
+  margin-bottom: 20px;
+  background-color: rgb(223, 223, 223);
 }
 
 .topnav a {
   float: left;
-  color: rgb(241, 225, 16);
+  color: rgb(241, 241, 241);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -30,8 +31,9 @@ body {
 }
 
 .topnav a.active {
-  background-color: rgb(241, 225, 16);
-  color: rgb(140, 16, 16);
+  background-color: rgb(239, 239, 239);
+  border-bottom: 5px solid rgb(70, 134, 240);
+  color: rgb(70, 134, 240);
 }
 .button {
   background-color: rgb(140, 16, 16); 
@@ -69,3 +71,59 @@ body {
 .checkbox-group label input[type=checkbox] {
 				margin-right: 5px;
 				}
+				
+.title-container {
+ 	display: flex;
+ 	justify-content: center;
+}	
+	
+.title-container .title {
+	border-bottom: 2px solid black;
+}
+
+.question-title {
+	font-weight: 600;
+}
+
+.group-container {
+	background-color: rgb(187, 187, 253);
+}
+
+.question-container {
+	background-color:  rgb(226, 218, 254);
+	border: 1px solid black;
+	margin: 20px;
+	padding: 20px;
+}
+
+.leaf-container {
+	margin: 5px;
+	padding: 5px;
+	background-color:  rgb(226, 225, 253);
+}
+
+.coding-container {
+	display: flex;
+	flex-direction: column;
+	margin: 5px;
+	padding: 5px;
+	background-color:  rgb(249, 249, 249);
+}
+
+.boolean-question {
+	background-color:  rgb(234, 241, 255);
+}
+
+.quantity-container {
+	background-color:  rgb(229, 235, 251);
+}
+
+.quantity-container .unit-label {
+	color: rgb(75, 75, 75);
+	font-size: 13px;
+}
+
+.error-label {
+	font-weight: 600;
+	color: darkred;
+}

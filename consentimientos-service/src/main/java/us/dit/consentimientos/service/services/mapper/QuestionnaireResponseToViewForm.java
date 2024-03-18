@@ -101,7 +101,7 @@ public class QuestionnaireResponseToViewForm implements IMapper<String, String> 
 		case DATE:
 			question = createDateComponent(item, itemResponse);
 			break;
-		case CHOICE:
+		case CODING:
 			question = createChoiceComponent(item, itemResponse);
 			break;
 		case GROUP:
@@ -135,7 +135,7 @@ public class QuestionnaireResponseToViewForm implements IMapper<String, String> 
 			case DATE:
 				component = component + createDateComponent(item1, it1);
 				break;
-			case CHOICE:
+			case CODING:
 				component = component + createChoiceComponent(item1, it1);
 				break;
 			case GROUP:

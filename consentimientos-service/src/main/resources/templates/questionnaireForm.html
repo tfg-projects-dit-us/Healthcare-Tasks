@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- Ayuda con edicion html https://www.w3schools.com/howto/default.asp -->
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${questionnaire.title}"></title>
+	<link rel="stylesheet" href="../static/css/form-styles.css">
+</head>
+
+<body>
+	<div th:insert="~{navbar.html}"/>
+	<div class="title-container">
+		<h3 th:id="questionnaireId" class="title" th:text="${questionnaire.id}" />
+	</div>
+	<!-- El enctype es para que permita enviar archivos, para los items de tipo attachment -->
+	<form th:action="@{/submit}" method="post" enctype="multipart/form-data">
+		<input type="hidden" th:id="questionnaireId" th:name="questionnaireId" th:value="${questionnaire.id}">
+		<div th:each="item : ${questionnaire.item}">
+			<div th:switch="${#strings.toString(item.type)}">
+				<div th:case="'DISPLAY'" th:insert="~{itemsTypes :: display(${item})}"/>
+				<div th:case="'QUESTION'" th:insert="~{itemsTypes :: question(${item})}"/>
+				<div th:case="'GROUP'" th:insert="~{itemsTypes :: group(${item})}"/>
+				<div th:case="*" th:insert="~{itemsTypes :: leaf(${item})}"/>
+			</div>
+		</div>
+		<button type="submit">Enviar respuesta</button>
+	</form>
+	
+	<script th:src="@{/js/scripts.js}"></script>
+</body>
+
+</html>

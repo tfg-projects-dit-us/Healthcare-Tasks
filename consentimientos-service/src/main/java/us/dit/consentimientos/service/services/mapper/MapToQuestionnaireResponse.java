@@ -73,7 +73,7 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 							.setValue(new StringType(getParameter(values)));
 					example.add(t);
 					break;
-				case CHOICE:
+				case CODING:
 					t.setLinkId(it.getLinkId()).setText(it.getText()).addAnswer()
 							.setValue(new StringType(getParameter(values)));
 					example.add(t);

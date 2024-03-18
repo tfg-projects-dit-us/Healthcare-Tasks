@@ -22,7 +22,8 @@
     -->
   </parent>
   <properties>
-    <hapifhir.version>5.1.0</hapifhir.version>
+    <postgresql.version>42.2.19</postgresql.version>
+    <hapifhir.version>6.10.0</hapifhir.version>
     <version.org.kie>7.74.1.Final</version.org.kie>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -112,6 +113,11 @@
   		<artifactId>spring-boot-configuration-processor</artifactId>
   		<optional>true</optional>
   	</dependency>
+  	<dependency>
+  		<groupId>us.dit</groupId>
+  		<artifactId>consentimientos-model</artifactId>
+  		<version>1.0-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
   <build>
     <plugins>
@@ -167,9 +173,11 @@
   </activation>
   <dependencies>
     <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-    </dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>${postgresql.version}</version>
+</dependency>
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>

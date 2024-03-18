@@ -51,7 +51,7 @@ public class DefaultWebSecurityConfig {
 		 * https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/web/builders/HttpSecurity.html#authorizeHttpRequests(org.springframework.security.config.Customizer)
 		 */
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-				.antMatchers("/*").authenticated().antMatchers("/img/*")
+				.antMatchers("/**").authenticated().antMatchers("/*", "/img/*","/js/**", "/css/**")
 				.permitAll())
 				.exceptionHandling((exceptionHandling) -> exceptionHandling.accessDeniedPage("/access-denied.html"))
 				.csrf((csrf) -> csrf.disable()).httpBasic(withDefaults()).cors(withDefaults())
