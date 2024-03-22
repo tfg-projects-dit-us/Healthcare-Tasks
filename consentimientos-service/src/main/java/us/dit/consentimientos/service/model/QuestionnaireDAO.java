@@ -18,7 +18,6 @@ import org.hl7.fhir.r5.model.StringType;
 import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import us.dit.consentimientos.model.TaskInputTypes;
 

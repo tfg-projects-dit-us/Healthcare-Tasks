@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
-import us.dit.consentimientos.service.model.QuestionnaireDAO;
+import us.dit.consentimientos.service.services.fhir.FhirClient;
 
 /**
  * 
@@ -23,13 +23,14 @@ import us.dit.consentimientos.service.model.QuestionnaireDAO;
 public class QuestionnaireHttp {
 	private static final Logger logger = LogManager.getLogger();
 	@Autowired
-	QuestionnaireDAO questionnaireDao;
+	FhirClient fhirClient;
+	
 	@GetMapping() 
 	public String getQuestionnaire(HttpSession session, Model model) {
 		logger.info("Entro en getQuestionnaire del controlador Http");	
 		String serverBase = "http://hapi.fhir.org/baseR5/";
 		String taskId = "739883";
-		Questionnaire questionnaire = questionnaireDao.getQuestionnaire(taskId, serverBase);
+		Questionnaire questionnaire = fhirClient.getQuestionnaireFromTask(taskId, serverBase);
 		if (questionnaire != null) {
 			model.addAttribute("questionnaire", questionnaire);
 			return "questionnaireForm";
