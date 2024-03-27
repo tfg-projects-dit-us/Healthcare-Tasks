@@ -127,12 +127,11 @@ public class FormController {
 	                         reference.setReference(value);
 	                         responseItem.addAnswer().setValue(reference);
 	                         break;
-                         //TODO @marcoamo revisar por qué no coge el tipo coding
-//	                     case CODING:
-//	                         Coding coding = new Coding();
-//	                         coding.setDisplay(value);
-//	                         responseItem.addAnswer().setValue(coding);
-//	                         break;
+	                     case CODING:
+	                         Coding coding = new Coding();
+	                         coding.setDisplay(value);
+	                         responseItem.addAnswer().setValue(coding);
+	                         break;
 	                     default:
                     	 	System.out.println("Este tipo de item no está contemplado");
 	                         break;
