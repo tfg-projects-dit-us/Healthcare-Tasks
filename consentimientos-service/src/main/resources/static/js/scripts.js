@@ -1,3 +1,6 @@
+/*
+  Autor: Marco Antonio Maldonado Orozco
+*/
 //Esta función agrega un nuevo input de forma genérica del tipo que se le pase y lo añade en el contenedor correspondiente
 //a esos inputs teniendo en cuenta también el linkId del item que sería el inputId
 function agregarOtroInput(inputId, inputType) {
