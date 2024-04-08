@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
+
+import us.dit.consentimientos.service.model.TasksDAO;
 import us.dit.consentimientos.service.services.fhir.FhirClient;
 
 /**
@@ -25,11 +27,19 @@ public class QuestionnaireHttp {
 	@Autowired
 	FhirClient fhirClient;
 	
+	@Autowired
+	TasksDAO tasksDao;
+	
 	@GetMapping() 
 	public String getQuestionnaire(HttpSession session, Model model) {
 		logger.info("Entro en getQuestionnaire del controlador Http");	
 		String serverBase = "http://hapi.fhir.org/baseR5/";
 		String taskId = "739883";
+		
+		logger.info("****************************************************");
+		logger.info(tasksDao.findAllPendingTasks());
+		logger.info("****************************************************");
+		
 		Questionnaire questionnaire = fhirClient.getQuestionnaireFromTask(taskId, serverBase);
 		if (questionnaire != null) {
 			model.addAttribute("questionnaire", questionnaire);
