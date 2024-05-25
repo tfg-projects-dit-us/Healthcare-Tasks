@@ -72,7 +72,7 @@ public class DefaultWebSecurityConfig {
 		// $2a$12$Pa3IIDS5JhAJpiLt5/lT4O5KVw1pyU.dVGpz/q7kEGUAH.JL85tRC
 		UserDetails user = User.withUsername("user").password(encoder.encode("user")).roles("kie-server").build();
 		// $2a$12$irR0VcP4SdtvAn7cbnXXQ.Cnfk/NlLWZa4mnx0J8EeXFum8Pt1pfm
-		UserDetails wbadmin = User.withUsername("wbadmin").password(encoder.encode("wbadmin")).roles("admin").build();
+		UserDetails wbadmin = User.withUsername("wbadmin").password(encoder.encode("wbadmin")).roles("kie-server").build();
 		//Este usuario se va a utilizar para el acceso al servidor
 		UserDetails consentimientos = User.withUsername("consentimientos").password(encoder.encode("consentimientos")).roles("kie-server").build();
 		// $2a$12$1T7IYm0PmxpWyJFjqTSlm.489.s65TvHJbW4R7d1SG0giNHb5bqAm
