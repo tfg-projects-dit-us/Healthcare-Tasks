@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{tasks.title}"></title>
+    <link rel="stylesheet" href="../css/allTasks-styles.css">
+	<!-- Autor: Marco Antonio Maldonado Orozco -->
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="#{tasks.title}"></h1>
+        <div class="button-container">
+            <button onclick="window.location.href='/tasks/assignedTasks'" th:text="#{tasks.assignedTasks}"></button>
+            <button onclick="window.location.href='/tasks/potentialTasks'" th:text="#{tasks.potentialTasks}"></button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<title th:text="#{tasks.assignedTasks}"></title>
+	<link rel="stylesheet" th:href="@{/css/tasks-styles.css}">
+	<!-- Autor: Marco Antonio Maldonado Orozco -->
+</head>
+<body>
+	<script th:src="@{/js/taskActions.js}"></script>
+	<div class="header">
+        <button class="back-button" onclick="window.location.href='/tasks/tasks'" th:text="#{back}"></button>
+    	<h1 th:text="#{tasks.assignedTasks}"></h1>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th th:text="#{tasks.name}"></th>
+                <th th:text="#{tasks.creationDate}"></th>
+                <th th:text="#{tasks.status}"></th>
+                <th th:text="#{tasks.actions}"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="task : ${tasks}">
+                <td th:text="${task.name}"></td>
+                <td th:text="${#dates.format(task.createdOn, 'yyyy/MM/dd HH:mm:ss')}"></td>
+                <td th:text="#{'task.status.' + ${task.status}}"></td>
+                <td class="actions">
+                    <form method="post" action="/tasks/start">
+                        <input type="hidden" name="taskId" th:value="${task.id}">
+                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
+                        <input type="hidden" name="containerId" th:value="${task.containerId}">
+                        <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
+                        <button type="submit" th:text="#{tasks.start}" th:disabled="${task.status == 'InProgress'}"></button>
+                    </form>
+                    <form method="post" action="/tasks/continue">
+                        <input type="hidden" name="taskId" th:value="${task.id}">
+                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
+                        <input type="hidden" name="containerId" th:value="${task.containerId}">
+                        <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
+                        <button type="submit" th:text="#{tasks.continue}"></button>
+                    </form>
+                    <form method="post" action="/tasks/reject">
+                        <input type="hidden" name="taskId" th:value="${task.id}">
+                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
+                        <input type="hidden" name="containerId" th:value="${task.containerId}">
+                        <button type="submit" th:text="#{tasks.reject}"></button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

@@ -129,20 +129,17 @@ public class TasksController {
 	}
 	
 	@PostMapping("/claim")
-    public String claimTask(@RequestParam("taskId") Long taskId, @RequestParam("containerId") String containerId, Model model) {
+    public RedirectView claimTask(@RequestParam("taskId") Long taskId, @RequestParam("containerId") String containerId, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
 		String user = principal.getUsername();
 		taskDao.claimTask(taskId, user, containerId);
-        List<TaskSummary> tasks = taskDao.findPotentialTasks(user);
-		model.addAttribute("tasks", tasks);
-        return "potentialTasks";
+        return new RedirectView("/tasks/potentialTasks");
     }
 	
 	@PostMapping("/start")
     public RedirectView startTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId,
-    		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {
-        
+    		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {     
 		String taskURI = taskDao.startTask(taskId, actualOwner, containerId, processInstanceId);
         redirectAttributes.addAttribute(TASK_URI, taskURI);
         return new RedirectView("/questionnaire");
@@ -158,10 +155,8 @@ public class TasksController {
     }
 	
 	@PostMapping("/reject")
-    public String rejectTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, Model model) {
+    public RedirectView rejectTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, Model model) {
         taskDao.rejectTask(taskId, actualOwner, containerId);
-        List<TaskSummary> tasks = taskDao.findAssignedTasks(actualOwner);
-		model.addAttribute("tasks", tasks);
-        return "assignedTasks";
+        return new RedirectView("/tasks/assignedTasks");
     }
 }

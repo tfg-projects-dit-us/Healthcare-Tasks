@@ -1,0 +1,96 @@
+/* Estilos básicos para la página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Estilos para el título */
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+h1 {
+    color: #333;
+    font-size: 2em;
+    margin: 20px 0;
+}
+
+.back-button {
+	font-size: 1.2em;
+	left: 5px;
+    position: absolute;
+    cursor: pointer;
+    color: #6c757d;
+    background-color: transparent;
+    border: none;
+}
+
+.back-button:hover {
+    color: rgb(75, 82, 86);
+}
+
+/* Estilos para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para las cabeceras de la tabla */
+table th {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Estilos para las celdas de la tabla */
+table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Estilos para las filas de la tabla */
+table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para las acciones (formularios y botones) */
+.actions {
+    display: flex;
+    gap: 10px; /* Espacio entre formularios */
+}
+
+.actions form {
+    display: inline-block;
+    margin: 0;
+}
+
+/* Estilos para los botones */
+.actions button {
+    background-color: rgb(44, 133, 241);
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.actions button:hover {
+    background-color: #0056b3;
+}
+
+.actions button:disabled {
+    background-color: rgb(138, 193, 255);
+}
+
