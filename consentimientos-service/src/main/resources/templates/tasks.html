@@ -8,10 +8,22 @@
 <body>
     <div class="container">
         <h1 th:text="#{tasks.title}"></h1>
+        <div id="alertBox" th:if="${message}" th:class="${'floating-alert-' + alertClass}" th:text="#{${message}}"></div>
         <div class="button-container">
             <button onclick="window.location.href='/tasks/assignedTasks'" th:text="#{tasks.assignedTasks}"></button>
             <button onclick="window.location.href='/tasks/potentialTasks'" th:text="#{tasks.potentialTasks}"></button>
         </div>
     </div>
+    <script>
+        window.onload = function() {
+            var alertBox = document.getElementById("alertBox");
+            if (alertBox) {
+                alertBox.style.display = 'block';
+                setTimeout(function() {
+                    alertBox.style.display = 'none';
+                }, 4000); // Esconder después de 5 segundos
+            }
+        };
+    </script>
 </body>
 </html>

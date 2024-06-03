@@ -93,7 +93,23 @@ public class TasksDAO {
 		client.releaseTask(containerId, taskId, user);
 	}
 	
-	public Map<String, Object> getTaskInputContent(UserTaskServicesClient client, Long taskId, String containerId, Long processInstanceId) {
+	public void completeTask(Long taskId) throws Exception {
+		UserTaskServicesClient client = kie.getUserTaskServicesClient();
+		TaskInstance taskInstance = client.findTaskById(taskId);
+		String containerId = taskInstance.getContainerId();
+		String user = taskInstance.getActualOwner();
+		logger.info("Completar la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
+		client.completeTask(containerId, taskId, user, new HashMap<>());
+	}
+	
+	public String getTaskURIFromTaskInputContent(Long taskId, String containerId, Long processInstanceId) {
+		UserTaskServicesClient client = kie.getUserTaskServicesClient();
+		Map<String, Object> inputData = getTaskInputContent(client, taskId, containerId, processInstanceId);
+        String taskURI = (String) inputData.get(TASK_URI);
+        return taskURI;
+	}
+	
+	private Map<String, Object> getTaskInputContent(UserTaskServicesClient client, Long taskId, String containerId, Long processInstanceId) {
 		ProcessServicesClient processClient = kie.getProcessServicesClient();
 		logger.info("Obtenemos las variables de entrada de la tarea " + taskId);
 		TaskInstance taskInstance = client.findTaskById(taskId);

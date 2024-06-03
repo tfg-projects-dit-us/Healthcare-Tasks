@@ -17,6 +17,8 @@
 	<!-- El enctype es para que permita enviar archivos, para los items de tipo attachment -->
 	<form th:action="@{/submit}" method="post" enctype="multipart/form-data">
 		<input type="hidden" th:id="questionnaireId" th:name="questionnaireId" th:value="${questionnaire.id}">
+		<input type="hidden" th:id="taskId" th:name="taskId" th:value="${taskId}">
+		<input type="hidden" th:id="taskURI" th:name="taskURI" th:value="${taskURI}">
 		<div th:each="item : ${questionnaire.item}">
 			<div th:switch="${#strings.toString(item.type)}">
 				<div th:case="'DISPLAY'" th:insert="~{itemsTypes :: display(${item})}"/>

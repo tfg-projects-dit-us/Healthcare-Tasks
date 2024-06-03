@@ -9,12 +9,13 @@
 <body>
 	<script th:src="@{/js/taskActions.js}"></script>
 	<div class="header">
-        <button class="back-button" onclick="window.location.href='/tasks/tasks'" th:text="#{back}"></button>
+        <button class="back-button" onclick="window.location.href='/tasks'" th:text="#{back}"></button>
     	<h1 th:text="#{tasks.assignedTasks}"></h1>
     </div>
     <table>
         <thead>
             <tr>
+				<th th:text="#{tasks.processId}"></th>
                 <th th:text="#{tasks.name}"></th>
                 <th th:text="#{tasks.creationDate}"></th>
                 <th th:text="#{tasks.status}"></th>
@@ -23,6 +24,7 @@
         </thead>
         <tbody>
             <tr th:each="task : ${tasks}">
+				<td th:text="${task.processId}"></td>
                 <td th:text="${task.name}"></td>
                 <td th:text="${#dates.format(task.createdOn, 'yyyy/MM/dd HH:mm:ss')}"></td>
                 <td th:text="#{'task.status.' + ${task.status}}"></td>
@@ -32,19 +34,20 @@
                         <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
                         <input type="hidden" name="containerId" th:value="${task.containerId}">
                         <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
-                        <button type="submit" th:text="#{tasks.start}" th:disabled="${task.status == 'InProgress'}"></button>
+                        <button type="submit" th:text="#{tasks.start}" th:disabled="${task.status != 'Reserved'}"></button>
                     </form>
                     <form method="post" action="/tasks/continue">
                         <input type="hidden" name="taskId" th:value="${task.id}">
                         <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
                         <input type="hidden" name="containerId" th:value="${task.containerId}">
                         <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
-                        <button type="submit" th:text="#{tasks.continue}"></button>
+                        <button type="submit" th:text="#{tasks.continue}" th:disabled="${task.status != 'InProgress'}"></button>
                     </form>
                     <form method="post" action="/tasks/reject">
                         <input type="hidden" name="taskId" th:value="${task.id}">
                         <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
                         <input type="hidden" name="containerId" th:value="${task.containerId}">
+                        <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
                         <button type="submit" th:text="#{tasks.reject}"></button>
                     </form>
                 </td>

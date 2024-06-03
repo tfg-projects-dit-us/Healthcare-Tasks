@@ -31,17 +31,13 @@ import org.hl7.fhir.r5.model.Task.TaskInputComponent;
 @Service
 public class QuestionnaireDAO {
 	private static final Logger logger = LogManager.getLogger();
-	public Questionnaire getQuestionnaire(String taskId, String serverBase) {
+	
+	public Questionnaire getQuestionnaireFromTask(String taskId, String serverBase) {
 		try {
-			logger.info("Entro en getQuestionnarie del DAO");
-			//MANERA DE RECUPERAR EL QUESTIONNAIRE DE LOCAL
-			//InputStream   inputStream = Q2formApplication.class.getClassLoader().getResourceAsStream("questionnaire.json");
-			//IParser parser = ctx.newJsonParser();
-			//Questionnaire questionnaire = parser.parseResource(Questionnaire.class,inputStream);
+			logger.info("Buscar task por Id para buscar el questionnaire a partir de la task");
 			FhirContext ctx = FhirContext.forR5();
 			IGenericClient client = ctx.newRestfulGenericClient(serverBase);
 			String questionnaireId = "";
-
 			logger.info("Busco la task " + taskId + " en " + serverBase);
 			Task myTask = client.read().resource(Task.class).withId(taskId).execute();
 			List<TaskInputComponent> myTaskInputs = myTask.getInput();
