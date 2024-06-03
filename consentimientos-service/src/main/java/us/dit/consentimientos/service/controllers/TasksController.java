@@ -55,8 +55,8 @@ public class TasksController {
 	@Autowired
 	private FhirDAO fhirDao;
 	
-	@Autowired
-	private ReviewService review;
+//	@Autowired
+//	private ReviewService review;
 		
 	@GetMapping()
 	public String TasksSelection(HttpSession session, Model model) {
