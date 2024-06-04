@@ -36,8 +36,13 @@ public class QuestionnaireController {
 		
 		Questionnaire questionnaire = questionnaireDAO.getQuestionnaireFromTask(taskURI, serverBase);
 		if (questionnaire != null) {
+			
+			//Id de la tarea de businessCentral para saber qué tarea jbpm hay que completar cuando se envíe el cuestionario
 			model.addAttribute("taskId", taskId);
+			
+			//Id de la tarea fhir para saber qué tarea fhir hay que completar cuando se envíe el cuestionario
 			model.addAttribute("taskURI", taskURI);
+			
 			model.addAttribute("questionnaire", questionnaire);
 			return "questionnaireForm";
 		} else {

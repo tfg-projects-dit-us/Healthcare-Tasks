@@ -6,27 +6,18 @@ package us.dit.consentimientos.service.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import org.hl7.fhir.r5.model.CodeableConcept;
 import org.hl7.fhir.r5.model.Coding;
-import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.StringType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
-import us.dit.consentimientos.model.TaskInputTypes;
 
 import org.hl7.fhir.r5.model.Task;
-import org.hl7.fhir.r5.model.Task.TaskInputComponent;
 import org.hl7.fhir.r5.model.Task.TaskOutputComponent;
 
 
@@ -34,7 +25,7 @@ import org.hl7.fhir.r5.model.Task.TaskOutputComponent;
  * @author Marco Antonio Maldonado Orozco
  */
 @Service
-public class FhirDAO {
+public class FhirTasksDAO {
 	
 	private static final Logger logger = LogManager.getLogger();
 	
@@ -56,7 +47,7 @@ public class FhirDAO {
 		return responseId;
 	}
 	
-	public String finalizeTask(String serverBase, String taskId, QuestionnaireResponse questionnaireResponse) throws Exception {
+	public String completeTask(String serverBase, String taskId, QuestionnaireResponse questionnaireResponse) throws Exception {
 		String questionnaireResponseId = saveQuestionnaireResponse(serverBase, questionnaireResponse);
 		String responseId = null;
 		logger.info("Se va a finalizar la tarea " + taskId + " con el cuestionario de respuesta " + questionnaireResponseId);

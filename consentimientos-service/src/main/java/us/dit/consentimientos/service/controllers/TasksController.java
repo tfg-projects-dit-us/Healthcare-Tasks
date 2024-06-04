@@ -4,14 +4,10 @@
 package us.dit.consentimientos.service.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Task;
-import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,16 +17,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import us.dit.consentimientos.service.model.FhirDAO;
+import us.dit.consentimientos.service.model.FhirTasksDAO;
 import us.dit.consentimientos.service.model.TasksDAO;
-import us.dit.consentimientos.service.services.kie.ReviewService;
 
 /**
  * @author Marco Antonio Maldonado Orozco
@@ -38,7 +32,6 @@ import us.dit.consentimientos.service.services.kie.ReviewService;
 @Controller
 @RequestMapping("/tasks")
 public class TasksController {
-	private static final Logger logger = LogManager.getLogger();
 	
 	//Nombre del parámetro de entrada del workItemHandler que contiene el ID de la tarea fhir
 	private static final String TASK_URI = "taskURI";
@@ -53,7 +46,7 @@ public class TasksController {
 	private TasksDAO taskDao;
 	
 	@Autowired
-	private FhirDAO fhirDao;
+	private FhirTasksDAO fhirDao;
 	
 //	@Autowired
 //	private ReviewService review;

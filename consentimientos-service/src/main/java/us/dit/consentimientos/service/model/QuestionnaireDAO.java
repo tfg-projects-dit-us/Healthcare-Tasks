@@ -6,13 +6,8 @@ package us.dit.consentimientos.service.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
-import org.hl7.fhir.r5.model.CodeableConcept;
-import org.hl7.fhir.r5.model.Coding;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.StringType;
 import org.springframework.stereotype.Service;

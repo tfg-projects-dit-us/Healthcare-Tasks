@@ -9,24 +9,20 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.kie.api.runtime.process.WorkItem;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.ProcessServicesClient;
-import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Properties;
 
 import us.dit.consentimientos.service.services.kie.KieUtilService;
 
@@ -43,7 +39,11 @@ public class TasksDAO {
 	@Autowired
 	private KieUtilService kie;
 
-	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
 	public List<TaskSummary> findAllTasks(String user) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		logger.info("Invocando findAllTasks con usuario: "+ user);
@@ -152,22 +152,6 @@ public class TasksDAO {
 		return tasksByType;
 	}
 	
-	private Map<String, String> extractMetadataJson(String taskDescription) throws JsonMappingException, JsonProcessingException {
-        int start = taskDescription.indexOf('{');
-        int end = taskDescription.lastIndexOf('}');
-        ObjectMapper mapper = new ObjectMapper();
-        if (start >= 0 && end > start) {
-        	String taskDescriptionSubstring = taskDescription.substring(start, end + 1);
-        	Map<String, Object> extractMetadataJson = mapper.readValue(taskDescriptionSubstring, Map.class);
-        	logger.info("METADATA MAP" + extractMetadataJson);
-        	Map<String, String> metadata = (Map<String, String>) extractMetadataJson.get("metadata");
-            logger.info("METADATA" + metadata);
-            return metadata;
-        }
-
-        return new HashMap<>();
-    }
-	
 	public List<TaskInstance> findAllPotentialPendingTaskInstances(String user) {
 		List<TaskInstance> taskInstances = new ArrayList<>();
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
@@ -189,6 +173,23 @@ public class TasksDAO {
 			taskInstances.addAll(client.findTaskEvents("human-tasks-management-kjar-1.0.0-SNAPSHOT", task.getId(), 0, 100));
 		}
 		return taskInstances;
+    }
+	
+	//Este método es por si en la descripción se le quiere pasar información extra de la tarea en fomra de JSON poder extraerla
+	private Map<String, String> extractMetadataJson(String taskDescription) throws JsonMappingException, JsonProcessingException {
+        int start = taskDescription.indexOf('{');
+        int end = taskDescription.lastIndexOf('}');
+        ObjectMapper mapper = new ObjectMapper();
+        if (start >= 0 && end > start) {
+        	String taskDescriptionSubstring = taskDescription.substring(start, end + 1);
+        	Map<String, Object> extractMetadataJson = mapper.readValue(taskDescriptionSubstring, Map.class);
+        	logger.info("METADATA MAP" + extractMetadataJson);
+        	Map<String, String> metadata = (Map<String, String>) extractMetadataJson.get("metadata");
+            logger.info("METADATA" + metadata);
+            return metadata;
+        }
+
+        return new HashMap<>();
     }
 	
 	

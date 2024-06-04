@@ -1,6 +1,4 @@
 package us.dit.consentimientos.service.controllers;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,10 +9,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hl7.fhir.r5.model.Attachment;
 import org.hl7.fhir.r5.model.BooleanType;
 import org.hl7.fhir.r5.model.Coding;
-import org.hl7.fhir.r5.model.DataType;
 import org.hl7.fhir.r5.model.DateTimeType;
 import org.hl7.fhir.r5.model.DateType;
 import org.hl7.fhir.r5.model.DecimalType;
@@ -22,7 +18,6 @@ import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.Quantity;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemComponent;
-import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemType;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.r5.model.Reference;
@@ -32,7 +27,6 @@ import org.hl7.fhir.r5.model.UrlType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +35,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import us.dit.consentimientos.service.model.FhirDAO;
+import us.dit.consentimientos.service.model.FhirTasksDAO;
 import us.dit.consentimientos.service.model.TasksDAO;
 
 /**
@@ -56,7 +50,7 @@ public class FormController {
 	private String serverBase;
 
 	@Autowired
-	FhirDAO fhirDao;
+	FhirTasksDAO fhirDao;
 	
 	@Autowired
 	TasksDAO tasksDao;
@@ -72,141 +66,20 @@ public class FormController {
 	    	//Obtengo el Questionnaire para poder buscar los items asociados a las respuestas a partir del linkId de cada item
 	    	Questionnaire questionnaire = getQuestionnaire(questionnaireUrl);
 	    	if (questionnaire == null) {
-	    		redirectAttributes.addFlashAttribute("message", "Ha ocurrido un error al completar la tarea");
-	            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+	    		redirectAttributes.addFlashAttribute("message", "task.complete.error");
+	            redirectAttributes.addFlashAttribute("alertClass", "error");
 	            return new RedirectView("/tasks");
 	    	}
 	    	//Construyo el QuestionnaireResponse para guardar las respuestas del formulario
-	    	QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
-	        questionnaireResponse.setQuestionnaire(questionnaire.getId());
-	        questionnaireResponse.setStatus(QuestionnaireResponse.QuestionnaireResponseStatus.COMPLETED);
-	        //Recorro todas las respuestas de tipo String (Todas menos las de tipo attachment que son ficheros)
-	        for (Map.Entry<String, String> entry : responseByInputName.entrySet()) {	
-	            String inputName = entry.getKey();
-	            String value = entry.getValue();
-	            //Compruebo que el valor no sea nulo ni vacío para filtrar preguntas sin respuestas
-	        	if (value != null && !value.isEmpty()) {
-	        		//Esta separación es porque el nombre de todos los items son linkId~nombreDelInput, de esta forma se obtiene el linkId
-	        		//para buscar el cuestionario
-	        		String[] parts = inputName.split("~");
-	                String linkId = parts[0];
-	                //A partir del linkId obtengo el item del Questionnaire para saber el tipo y poder construir la respuesta adecuada
-	                QuestionnaireItemComponent questionnaireItem = getItemFromLinkId(linkId, questionnaire);
-	                if (questionnaireItem != null) {
-	                	//Compruebo si existe algún item con ese linkId en el questionnaireResponse, por si hay preguntas con respuestas múltilples
-	                	//guardar todas las respuestas en el mismo item y no crear un item distinto para la misma pregunta con las distintas respuestas
-	                	 QuestionnaireResponse.QuestionnaireResponseItemComponent responseItem = findResponseItemByLinkId(linkId, questionnaireResponse);
-	                     //En caso de que no exista creo un nuevo Item del QuestionnarieResponse y lo añado.
-	                	 if (responseItem == null) {
-	                         responseItem = new QuestionnaireResponse.QuestionnaireResponseItemComponent();
-	                         responseItem.setLinkId(questionnaireItem.getLinkId());
-	                         responseItem.setText(questionnaireItem.getText());
-	                         questionnaireResponse.addItem(responseItem);
-	                     }
-	                	 //Según el tipo de pregunta construyo la respuesta pertinente y la añado al Item del QuestionnaireResponse
-	                     switch (questionnaireItem.getType()) {
-		                     case BOOLEAN:
-		                         responseItem.addAnswer().setValue(new BooleanType(Boolean.parseBoolean(value)));
-		                         break;
-		                     case DECIMAL:
-		                         responseItem.addAnswer().setValue(new DecimalType(value));
-		                         break;
-		                     case INTEGER:
-		                         responseItem.addAnswer().setValue(new IntegerType(Integer.parseInt(value)));
-		                         break;
-		                     case QUANTITY:
-		                    	 Quantity quantity = new Quantity()
-		                         	.setValue(new BigDecimal(value))
-		                         	.setUnit(questionnaireItem.getAnswerOptionFirstRep().getValueCoding().getCode());
-		                    	 responseItem.addAnswer().setValue(quantity);
-		                    	 break;
-		                     case DATE:
-		                    	 DateType date = createDateType(value);
-		                    	 if(date != null) {
-		                    		 responseItem.addAnswer().setValue(date);	                    		 
-		                    	 }
-		                         break;
-		                     case DATETIME:
-		                    	 DateTimeType dateTime = createDateTimeType(value);
-		                    	 if(dateTime != null) {
-		                    		 responseItem.addAnswer().setValue(dateTime);	                    		 
-		                    	 }
-		                         break;
-		                     case TIME:
-		                    	 LocalTime localTime = LocalTime.parse(value, DateTimeFormatter.ofPattern("HH:mm"));
-		                         String formattedTime = localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-		                         responseItem.addAnswer().setValue(new TimeType(formattedTime));
-		                         break;
-		                     case STRING:
-		                         responseItem.addAnswer().setValue(new StringType(value));
-		                         break;
-		                     case TEXT:
-		                         responseItem.addAnswer().setValue(new StringType(value));
-		                         break;
-		                     case URL:
-		                         responseItem.addAnswer().setValue(new UrlType(value));
-		                         break;
-		                     case REFERENCE:
-		                    	 Reference reference = new Reference();
-		                         reference.setReference(value);
-		                         responseItem.addAnswer().setValue(reference);
-		                         break;
-		                     case CODING:
-		                         Coding coding = new Coding();
-		                         coding.setCode(value);
-		                         coding.setDisplay(questionnaireItem.getText());
-		                         responseItem.addAnswer().setValue(coding);
-		                         break;
-		                     default:
-	                    	 	System.out.println("Este tipo de item no está contemplado");
-		                         break;
-	                     }
-	                } else {
-	                	logger.error("No se encuentra item en questionnaire con linkId: " + linkId);
-	                }
-	            }
-	        }
+	    	QuestionnaireResponse questionnaireResponse = buildQuestionnaireResponse(questionnaire, responseByInputName);
 	        
-	        //Está comentado porque al guardar el questionnaire el attatchment lo guarda como texto parece ser y es demasiado largo y da error al
-	        //crear el recurso en el servidor de hapifhir.
-	        
-	        //En este for se recorren los inputs de tipo attachment en caso de que haya, ya que en el otro mapa no vienen al ser values string
-	        //El funcionamiento es el mismo pero adaptado al Item de tipo attachment
-//	        for (Map.Entry<String, MultipartFile> entry : filesByInputName.entrySet()) {	
-//	    		String inputName = entry.getKey();
-//	    		MultipartFile file = entry.getValue();
-//	    		if (file != null && !file.isEmpty()) {
-//	        		String[] parts = inputName.split("~");
-//	                String linkId = parts[0];
-//	                QuestionnaireItemComponent questionnaireItem = getItemFromLinkId(linkId, questionnaire);
-//	                if (questionnaireItem != null && QuestionnaireItemType.ATTACHMENT.equals(questionnaireItem.getType())) {
-//	                	QuestionnaireResponse.QuestionnaireResponseItemComponent responseItem = findResponseItemByLinkId(linkId, questionnaireResponse);
-//	                	if (responseItem == null) {
-//		                    responseItem = new QuestionnaireResponse.QuestionnaireResponseItemComponent();
-//		                    responseItem.setLinkId(questionnaireItem.getLinkId());
-//		                    responseItem.setText(questionnaireItem.getText());
-//		                    questionnaireResponse.addItem(responseItem);
-//	                	}
-//	            		try {		
-//	                		Attachment attachment = new Attachment();
-//	                		attachment.setTitle(file.getOriginalFilename());
-//	                        attachment.setContentType(file.getContentType());
-//							attachment.setData(file.getBytes());
-//							responseItem.addAnswer().setValue(attachment);
-//	            		} catch (IOException e) {
-//							System.err.println("Error obteniendo los datos del fichero de la pregunta" + questionnaireItem.getLinkId() 
-//							+ "\n" + e.getStackTrace());
-//						}
-//	                } else {
-//	                	logger.error("No se encuentra item de tipo attachment en questionnaire con linkId: " + linkId);
-//	                }
-//	    		}
-//	        }
-	        
+//	    	 //Está comentado porque al guardar el questionnaire el attatchment lo guarda como texto parece ser y es demasiado largo y da error al
+//	        //crear el recurso en el servidor de hapifhir.
+	    	//questionnaireResponse = addAttatchmentResponsesToQuestionnaireResponse(questionnaire, questionnaireResponse, filesByInputName);
+	       
 	        //printQuestionnaireResponseItems(questionnaireResponse);
 
-        	fhirDao.finalizeTask(serverBase, taskURI, questionnaireResponse);
-        	tasksDao.completeTask(taskId);
+        	completeTasks(taskURI, questionnaireResponse, taskId);
         } catch(Exception e) {
         	redirectAttributes.addFlashAttribute("message", "task.complete.error");
             redirectAttributes.addFlashAttribute("alertClass", "error");
@@ -219,46 +92,141 @@ public class FormController {
         return new RedirectView("/tasks");
     }
     
-    public void printQuestionnaireResponseItems(QuestionnaireResponse questionnaireResponse) {
-        for (QuestionnaireResponse.QuestionnaireResponseItemComponent item : questionnaireResponse.getItem()) {
-            String linkId = item.getLinkId();
-            System.out.println("LinkId: " + linkId);
-            for (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer : item.getAnswer()) {
-                String respuesta = getResponseValue(answer.getValue());
-                System.out.println("   Respuesta: " + respuesta);
+    private void completeTasks(String taskURI, QuestionnaireResponse questionnaireResponse, Long taskId) throws Exception {
+    	fhirDao.completeTask(serverBase, taskURI, questionnaireResponse);
+    	tasksDao.completeTask(taskId);
+    }
+    
+    private QuestionnaireResponse buildQuestionnaireResponse(Questionnaire questionnaire, Map<String, String> responseByInputName) {
+    	QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
+    	questionnaireResponse.setQuestionnaire(questionnaire.getId());
+        questionnaireResponse.setStatus(QuestionnaireResponse.QuestionnaireResponseStatus.COMPLETED);
+        //Recorro todas las respuestas de tipo String (Todas menos las de tipo attachment que son ficheros)
+        for (Map.Entry<String, String> entry : responseByInputName.entrySet()) {	
+            String inputName = entry.getKey();
+            String value = entry.getValue();
+            //Compruebo que el valor no sea nulo ni vacío para filtrar preguntas sin respuestas
+        	if (value != null && !value.isEmpty()) {
+        		//Esta separación es porque el nombre de todos los items son linkId~nombreDelInput, de esta forma se obtiene el linkId
+        		//para buscar el cuestionario
+        		String[] parts = inputName.split("~");
+                String linkId = parts[0];
+                //A partir del linkId obtengo el item del Questionnaire para saber el tipo y poder construir la respuesta adecuada
+                QuestionnaireItemComponent questionnaireItem = getItemFromLinkId(linkId, questionnaire);
+                if (questionnaireItem != null) {
+                	//Compruebo si existe algún item con ese linkId en el questionnaireResponse, por si hay preguntas con respuestas múltilples
+                	//guardar todas las respuestas en el mismo item y no crear un item distinto para la misma pregunta con las distintas respuestas
+                	 QuestionnaireResponse.QuestionnaireResponseItemComponent responseItem = findResponseItemByLinkId(linkId, questionnaireResponse);
+                     //En caso de que no exista creo un nuevo Item del QuestionnarieResponse y lo añado.
+                	 if (responseItem == null) {
+                         responseItem = new QuestionnaireResponse.QuestionnaireResponseItemComponent();
+                         responseItem.setLinkId(questionnaireItem.getLinkId());
+                         responseItem.setText(questionnaireItem.getText());
+                         questionnaireResponse.addItem(responseItem);
+                     }
+                	 //Según el tipo de pregunta construyo la respuesta pertinente y la añado al Item del QuestionnaireResponse
+                     switch (questionnaireItem.getType()) {
+	                     case BOOLEAN:
+	                         responseItem.addAnswer().setValue(new BooleanType(Boolean.parseBoolean(value)));
+	                         break;
+	                     case DECIMAL:
+	                         responseItem.addAnswer().setValue(new DecimalType(value));
+	                         break;
+	                     case INTEGER:
+	                         responseItem.addAnswer().setValue(new IntegerType(Integer.parseInt(value)));
+	                         break;
+	                     case QUANTITY:
+	                    	 Quantity quantity = new Quantity()
+	                         	.setValue(new BigDecimal(value))
+	                         	.setUnit(questionnaireItem.getAnswerOptionFirstRep().getValueCoding().getCode());
+	                    	 responseItem.addAnswer().setValue(quantity);
+	                    	 break;
+	                     case DATE:
+	                    	 DateType date = createDateType(value);
+	                    	 if(date != null) {
+	                    		 responseItem.addAnswer().setValue(date);	                    		 
+	                    	 }
+	                         break;
+	                     case DATETIME:
+	                    	 DateTimeType dateTime = createDateTimeType(value);
+	                    	 if(dateTime != null) {
+	                    		 responseItem.addAnswer().setValue(dateTime);	                    		 
+	                    	 }
+	                         break;
+	                     case TIME:
+	                    	 LocalTime localTime = LocalTime.parse(value, DateTimeFormatter.ofPattern("HH:mm"));
+	                         String formattedTime = localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+	                         responseItem.addAnswer().setValue(new TimeType(formattedTime));
+	                         break;
+	                     case STRING:
+	                         responseItem.addAnswer().setValue(new StringType(value));
+	                         break;
+	                     case TEXT:
+	                         responseItem.addAnswer().setValue(new StringType(value));
+	                         break;
+	                     case URL:
+	                         responseItem.addAnswer().setValue(new UrlType(value));
+	                         break;
+	                     case REFERENCE:
+	                    	 Reference reference = new Reference();
+	                         reference.setReference(value);
+	                         responseItem.addAnswer().setValue(reference);
+	                         break;
+	                     case CODING:
+	                         Coding coding = new Coding();
+	                         coding.setCode(value);
+	                         coding.setDisplay(questionnaireItem.getText());
+	                         responseItem.addAnswer().setValue(coding);
+	                         break;
+	                     default:
+                    	 	System.out.println("Este tipo de item no está contemplado");
+	                         break;
+                     }
+                } else {
+                	logger.error("No se encuentra item en questionnaire con linkId: " + linkId);
+                }
             }
         }
+        return questionnaireResponse;
     }
-
-    private String getResponseValue(DataType value) {
-        if (value instanceof BooleanType) {
-            return Boolean.toString(((BooleanType) value).getValue());
-        } else if (value instanceof DecimalType) {
-            return ((DecimalType) value).getValue().toString();
-        } else if (value instanceof IntegerType) {
-            return ((IntegerType) value).getValue().toString();
-        } else if (value instanceof Quantity) {
-            return ((Quantity) value).getValue().toString() + " " + ((Quantity) value).getUnit();
-        } else if (value instanceof DateType) {
-            return ((DateType) value).getValueAsString();
-        } else if (value instanceof DateTimeType) {
-            return ((DateTimeType) value).getValueAsString();
-        } else if (value instanceof TimeType) {
-            return ((TimeType) value).getValueAsString();
-        } else if (value instanceof StringType) {
-            return ((StringType) value).getValue();
-        } else if (value instanceof UrlType) {
-            return ((UrlType) value).getValue();
-        } else if (value instanceof Reference) {
-            return ((Reference) value).getReference();
-        } else if (value instanceof Coding) {
-            return ((Coding) value).getDisplay();
-        } else if (value instanceof Attachment) {
-            return ((Attachment) value).getTitle();
-        } else {
-            return "Tipo de respuesta no compatible";
-        }
-    }
+    
+//    private QuestionnaireResponse addAttatchmentResponsesToQuestionnaireResponse(Questionnaire questionnaire,
+//    		QuestionnaireResponse questionnaireResponse, Map<String, MultipartFile> filesByInputName) {
+//        
+//        //En este for se recorren los inputs de tipo attachment en caso de que haya, ya que en el otro mapa no vienen al ser values string
+//        //El funcionamiento es el mismo pero adaptado al Item de tipo attachment
+//        for (Map.Entry<String, MultipartFile> entry : filesByInputName.entrySet()) {	
+//    		String inputName = entry.getKey();
+//    		MultipartFile file = entry.getValue();
+//    		if (file != null && !file.isEmpty()) {
+//        		String[] parts = inputName.split("~");
+//                String linkId = parts[0];
+//                QuestionnaireItemComponent questionnaireItem = getItemFromLinkId(linkId, questionnaire);
+//                if (questionnaireItem != null && QuestionnaireItemType.ATTACHMENT.equals(questionnaireItem.getType())) {
+//                	QuestionnaireResponse.QuestionnaireResponseItemComponent responseItem = findResponseItemByLinkId(linkId, questionnaireResponse);
+//                	if (responseItem == null) {
+//	                    responseItem = new QuestionnaireResponse.QuestionnaireResponseItemComponent();
+//	                    responseItem.setLinkId(questionnaireItem.getLinkId());
+//	                    responseItem.setText(questionnaireItem.getText());
+//	                    questionnaireResponse.addItem(responseItem);
+//                	}
+//            		try {		
+//                		Attachment attachment = new Attachment();
+//                		attachment.setTitle(file.getOriginalFilename());
+//                        attachment.setContentType(file.getContentType());
+//						attachment.setData(file.getBytes());
+//						responseItem.addAnswer().setValue(attachment);
+//            		} catch (IOException e) {
+//						System.err.println("Error obteniendo los datos del fichero de la pregunta" + questionnaireItem.getLinkId() 
+//						+ "\n" + e.getStackTrace());
+//					}
+//                } else {
+//                	logger.error("No se encuentra item de tipo attachment en questionnaire con linkId: " + linkId);
+//                }
+//    		}
+//        }
+//        return questionnaireResponse;
+//    }
     
     private QuestionnaireItemComponent getItemFromLinkId(String linkId, Questionnaire questionnaire) {
         if (questionnaire != null && questionnaire.hasItem()) {
@@ -340,4 +308,45 @@ public class FormController {
             return null;
         }
     }
+    
+//  private void printQuestionnaireResponseItems(QuestionnaireResponse questionnaireResponse) {
+//  for (QuestionnaireResponse.QuestionnaireResponseItemComponent item : questionnaireResponse.getItem()) {
+//      String linkId = item.getLinkId();
+//      System.out.println("LinkId: " + linkId);
+//      for (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer : item.getAnswer()) {
+//          String respuesta = getResponseValue(answer.getValue());
+//          System.out.println("   Respuesta: " + respuesta);
+//      }
+//  }
+//}
+
+//    private String getResponseValue(DataType value) {
+//        if (value instanceof BooleanType) {
+//            return Boolean.toString(((BooleanType) value).getValue());
+//        } else if (value instanceof DecimalType) {
+//            return ((DecimalType) value).getValue().toString();
+//        } else if (value instanceof IntegerType) {
+//            return ((IntegerType) value).getValue().toString();
+//        } else if (value instanceof Quantity) {
+//            return ((Quantity) value).getValue().toString() + " " + ((Quantity) value).getUnit();
+//        } else if (value instanceof DateType) {
+//            return ((DateType) value).getValueAsString();
+//        } else if (value instanceof DateTimeType) {
+//            return ((DateTimeType) value).getValueAsString();
+//        } else if (value instanceof TimeType) {
+//            return ((TimeType) value).getValueAsString();
+//        } else if (value instanceof StringType) {
+//            return ((StringType) value).getValue();
+//        } else if (value instanceof UrlType) {
+//            return ((UrlType) value).getValue();
+//        } else if (value instanceof Reference) {
+//            return ((Reference) value).getReference();
+//        } else if (value instanceof Coding) {
+//            return ((Coding) value).getDisplay();
+//        } else if (value instanceof Attachment) {
+//            return ((Attachment) value).getTitle();
+//        } else {
+//            return "Tipo de respuesta no compatible";
+//        }
+//    }
 }
