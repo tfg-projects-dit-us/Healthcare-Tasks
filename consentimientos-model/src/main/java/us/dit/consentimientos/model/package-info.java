@@ -1,1 +1,0 @@
-package us.dit.consentimientos.model;
