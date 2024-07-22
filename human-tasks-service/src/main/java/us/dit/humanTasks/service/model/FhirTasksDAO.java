@@ -29,6 +29,13 @@ public class FhirTasksDAO {
 	
 	private static final Logger logger = LogManager.getLogger();
 	
+	/**
+	 * Update the FHIR task status
+	 * @param serverBase
+	 * @param taskId
+	 * @param taskStatus
+	 * @return String
+	 */
 	public String updateTaskStatus(String serverBase, String taskId, Task.TaskStatus taskStatus) {
 		String responseId = null;
 		try {
@@ -47,6 +54,14 @@ public class FhirTasksDAO {
 		return responseId;
 	}
 	
+	/**
+	 * Complete the FHIR task from id and attaching a QuestionnaireResponse
+	 * @param serverBase
+	 * @param taskId
+	 * @param questionnaireResponse
+	 * @return String
+	 * @throws Exception
+	 */
 	public String completeTask(String serverBase, String taskId, QuestionnaireResponse questionnaireResponse) throws Exception {
 		String questionnaireResponseId = saveQuestionnaireResponse(serverBase, questionnaireResponse);
 		String responseId = null;
@@ -76,6 +91,12 @@ public class FhirTasksDAO {
 		return responseId;
 	}
 	
+	/**
+	 * Persist in FHIR server the QuestionnaireResponse built from Questionnaire answers
+	 * @param serverBase
+	 * @param questionnaireResponse
+	 * @return
+	 */
 	private String saveQuestionnaireResponse(String serverBase, QuestionnaireResponse questionnaireResponse) {
 		String responseId = null;
 		try {

@@ -55,6 +55,16 @@ public class FormController {
 	@Autowired
 	TasksDAO tasksDao;
 	
+	/**
+	 * Main method which controls the submit action
+	 * @param responseByInputName
+	 * @param filesByInputName
+	 * @param questionnaireUrl
+	 * @param taskId
+	 * @param taskURI
+	 * @param redirectAttributes
+	 * @return RedirectView to Tasks page
+	 */
     @PostMapping("/submit")
     public RedirectView procesarFormulario(@RequestParam Map<String, String> responseByInputName, 
     		@RequestParam Map<String, MultipartFile> filesByInputName,
@@ -92,11 +102,24 @@ public class FormController {
         return new RedirectView("/tasks");
     }
     
+    /**
+     * Complete the FHIR and jBPM Tasks
+     * @param taskURI
+     * @param questionnaireResponse
+     * @param taskId
+     * @throws Exception
+     */
     private void completeTasks(String taskURI, QuestionnaireResponse questionnaireResponse, Long taskId) throws Exception {
     	fhirDao.completeTask(serverBase, taskURI, questionnaireResponse);
     	tasksDao.completeTask(taskId);
     }
     
+    /**
+     * build a QuestionnaireResponse generated from Questionnaire and responses in Questionnaire template
+     * @param questionnaire
+     * @param responseByInputName
+     * @return QuestionnaireResponse
+     */
     private QuestionnaireResponse buildQuestionnaireResponse(Questionnaire questionnaire, Map<String, String> responseByInputName) {
     	QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
     	questionnaireResponse.setQuestionnaire(questionnaire.getId());
@@ -228,6 +251,12 @@ public class FormController {
 //        return questionnaireResponse;
 //    }
     
+    /**
+     * Find in Questionnaire an item from its LinkId
+     * @param linkId
+     * @param questionnaire
+     * @return QuestionnaireItemComponent
+     */
     private QuestionnaireItemComponent getItemFromLinkId(String linkId, Questionnaire questionnaire) {
         if (questionnaire != null && questionnaire.hasItem()) {
             for (QuestionnaireItemComponent item : questionnaire.getItem()) {
@@ -240,6 +269,12 @@ public class FormController {
         return null;
     }
     
+    /**
+     * Search inside an QuestionnaireItemComponent for other Item in case it has more items.
+     * @param item
+     * @param linkId
+     * @return
+     */
     private QuestionnaireItemComponent getItemFromLinkIdRecursive(QuestionnaireItemComponent item, String linkId) {
         if (item.getLinkId().equals(linkId)) {
             return item;
@@ -258,18 +293,34 @@ public class FormController {
         return null;
     }
     
-    public static DateType createDateType(String valor) {
+    /**
+     * 
+     * @param valor
+     * @return DateType
+     */
+    private static DateType createDateType(String valor) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date parsedDate = parseDate(valor, dateFormat);
         return parsedDate != null ? new DateType(parsedDate) : null;
     }
 
-    public static DateTimeType createDateTimeType(String valor) {
+    /**
+     * 
+     * @param valor
+     * @return DateTimeType
+     */
+    private static DateTimeType createDateTimeType(String valor) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         Date parsedDate = parseDate(valor, dateFormat);
         return parsedDate != null ? new DateTimeType(parsedDate) : null;
     }
 
+    /**
+     * Format date
+     * @param valor
+     * @param dateFormat
+     * @return Date
+     */
     private static Date parseDate(String valor, SimpleDateFormat dateFormat) {
         try {
             return dateFormat.parse(valor);
@@ -279,6 +330,12 @@ public class FormController {
         }
     }
     
+    /**
+     * Find and QuestionnaireResponseItemComponent in a QuestionnaireResponse from its linkId
+     * @param linkId
+     * @param questionnaireResponse
+     * @return
+     */
     private QuestionnaireResponseItemComponent findResponseItemByLinkId(String linkId, QuestionnaireResponse questionnaireResponse) {
         for (QuestionnaireResponse.QuestionnaireResponseItemComponent item : questionnaireResponse.getItem()) {
             if (item.getLinkId().equals(linkId)) {
@@ -288,6 +345,11 @@ public class FormController {
         return null;
     }
     
+    /**
+     * Find the Questionnaire resource from its URL.
+     * @param questionnaireUrl
+     * @return
+     */
     private Questionnaire getQuestionnaire(String questionnaireUrl) {
         // Encuentra la posición del primer "/" después de "Questionnaire/"
 		// Ya que los URLs obtenidos de hapiFhir son así: https://hapi.fhir.org/baseR5/Questionnaire/677937/_history/1;

@@ -40,9 +40,9 @@ public class TasksDAO {
 	private KieUtilService kie;
 
 	/**
-	 * 
+	 * Find all jBPM tasks assigned and potential for user
 	 * @param user
-	 * @return
+	 * @return List<TaskSummary>
 	 */
 	public List<TaskSummary> findAllTasks(String user) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
@@ -50,24 +50,48 @@ public class TasksDAO {
 		return client.findTasksAssignedAsPotentialOwner(user, 0, Integer.MAX_VALUE);
     }
 	
+	/**
+	 * Find all jBPM assigned tasks for user
+	 * @param user
+	 * @return List<TaskSummary>
+	 */
 	public List<TaskSummary> findAssignedTasks(String user) {
 		logger.info("Invocando findAssignedTasks con usuario: "+ user);
 		List<TaskSummary> allTasks = findAllTasks(user);
 		return allTasks.stream().filter(task -> task.getActualOwner() != null).collect(Collectors.toList());
     }
 	
+	/**
+	 * Find all jBPM potential tasks for user
+	 * @param user
+	 * @return List<TaskSummary>
+	 */
 	public List<TaskSummary> findPotentialTasks(String user) {
 		logger.info("Invocando findPotentialTasks con usuario: "+ user);
 		List<TaskSummary> allTasks = findAllTasks(user);
 		return allTasks.stream().filter(task -> task.getActualOwner() == null).collect(Collectors.toList());
     }
 	
+	/**
+	 * Claim the jBPM Task with taskId for user
+	 * @param taskId
+	 * @param user
+	 * @param containerId
+	 */
 	public void claimTask(Long taskId, String user, String containerId) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		logger.info("Reclamar la tarea con id " + taskId + " del contenedor con id " + containerId + " para el usuario " + user);
 		client.claimTask(containerId, taskId, user);
 	}
 	
+	/**
+	 * Start the jBPM task with taskId for user and return the FHIR Task id associated
+	 * @param taskId
+	 * @param user
+	 * @param containerId
+	 * @param processInstanceId
+	 * @return String
+	 */
 	public String startTask(Long taskId, String user, String containerId, Long processInstanceId) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		logger.info("Comenzar la tarea con id " + taskId + " del contenedor con id " + containerId);
@@ -78,6 +102,14 @@ public class TasksDAO {
         return taskURI;
 	}
 	
+	/**
+	 * Return the FHIR Task id associated to the jBPM Task
+	 * @param taskId
+	 * @param user
+	 * @param containerId
+	 * @param processInstanceId
+	 * @return
+	 */
 	public String continueTask(Long taskId, String user, String containerId, Long processInstanceId) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		logger.info("Continuar la tarea con id " + taskId + " del contenedor con id " + containerId);
@@ -87,12 +119,23 @@ public class TasksDAO {
         return taskURI;
 	}
 	
+	/**
+	 * Reject the jBPM Task with taskId for user
+	 * @param taskId
+	 * @param user
+	 * @param containerId
+	 */
 	public void rejectTask(Long taskId, String user, String containerId) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		logger.info("Rechazar la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
 		client.releaseTask(containerId, taskId, user);
 	}
 	
+	/**
+	 * Complete the jBPM task with taskId
+	 * @param taskId
+	 * @throws Exception
+	 */
 	public void completeTask(Long taskId) throws Exception {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		TaskInstance taskInstance = client.findTaskById(taskId);
@@ -102,6 +145,13 @@ public class TasksDAO {
 		client.completeTask(containerId, taskId, user, new HashMap<>());
 	}
 	
+	/**
+	 * Finds FHIR task id from jBPM Task inputs.
+	 * @param taskId
+	 * @param containerId
+	 * @param processInstanceId
+	 * @return
+	 */
 	public String getTaskURIFromTaskInputContent(Long taskId, String containerId, Long processInstanceId) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		Map<String, Object> inputData = getTaskInputContent(client, taskId, containerId, processInstanceId);
@@ -109,6 +159,14 @@ public class TasksDAO {
         return taskURI;
 	}
 	
+	/**
+	 * Finds the input content from jBPM Task with taskId
+	 * @param client
+	 * @param taskId
+	 * @param containerId
+	 * @param processInstanceId
+	 * @return
+	 */
 	private Map<String, Object> getTaskInputContent(UserTaskServicesClient client, Long taskId, String containerId, Long processInstanceId) {
 		ProcessServicesClient processClient = kie.getProcessServicesClient();
 		logger.info("Obtenemos las variables de entrada de la tarea " + taskId);
@@ -120,7 +178,11 @@ public class TasksDAO {
 	
 	
 	/************************PARA FUTURO******************************/
-	
+	/**
+	 * Finds potentialTasks ordered by expiratoin date
+	 * @param user
+	 * @return List<TaskSummary>
+	 */
 	public List<TaskSummary> findAllPotentialPendingTasksExpirationDateOrdered(String user) {
 		Comparator<TaskSummary> comparator = Comparator.nullsLast(
 	            Comparator.comparing(TaskSummary::getExpirationTime, Comparator.nullsLast(Comparator.naturalOrder()))
@@ -130,6 +192,11 @@ public class TasksDAO {
 				.collect(Collectors.toList());
 	}
 	
+	/**
+	 * Finds all pontential tasks ordered by type
+	 * @param user
+	 * @return List<TaskSummary>
+	 */
 	public Multimap<String, TaskSummary> findAllPontentialPendingTasksByType(String user) {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		Multimap<String, TaskSummary> tasksByType = ArrayListMultimap.create();
@@ -152,30 +219,45 @@ public class TasksDAO {
 		return tasksByType;
 	}
 	
-	public List<TaskInstance> findAllPotentialPendingTaskInstances(String user) {
-		List<TaskInstance> taskInstances = new ArrayList<>();
-		UserTaskServicesClient client = kie.getUserTaskServicesClient();
-		List<TaskSummary> tasks = client.findTasksAssignedAsPotentialOwner(user, 0, Integer.MAX_VALUE);
-		for (TaskSummary task : tasks) {
-			logger.info("Asunto y prioridad TaskSummary: " + task.getSubject() + ", " + task.getPriority());
-			TaskInstance taskInstance = client.getTaskInstance("human-tasks-management-kjar-1.0.0-SNAPSHOT", task.getId(), true, true, true);
-			logger.info("Asunto y prioridad TaskInstance: " + taskInstance.getSubject() + ", " + taskInstance.getPriority());
-			taskInstances.add(taskInstance);
-		}
-		return taskInstances;
-    }
+//	public List<TaskInstance> findAllPotentialPendingTaskInstances(String user) {
+//		List<TaskInstance> taskInstances = new ArrayList<>();
+//		UserTaskServicesClient client = kie.getUserTaskServicesClient();
+//		List<TaskSummary> tasks = client.findTasksAssignedAsPotentialOwner(user, 0, Integer.MAX_VALUE);
+//		for (TaskSummary task : tasks) {
+//			logger.info("Asunto y prioridad TaskSummary: " + task.getSubject() + ", " + task.getPriority());
+//			TaskInstance taskInstance = client.getTaskInstance("human-tasks-management-kjar-1.0.0-SNAPSHOT", task.getId(), true, true, true);
+//			logger.info("Asunto y prioridad TaskInstance: " + taskInstance.getSubject() + ", " + taskInstance.getPriority());
+//			taskInstances.add(taskInstance);
+//		}
+//		return taskInstances;
+//    }
 	
-	public List<TaskEventInstance> findAllPotentialPendingTaskEventInstances(String user) {
-		List<TaskEventInstance> taskInstances = new ArrayList<>();
-		UserTaskServicesClient client = kie.getUserTaskServicesClient();
-		List<TaskSummary> tasks = client.findTasksAssignedAsPotentialOwner(user, 0, Integer.MAX_VALUE);
-		for (TaskSummary task : tasks) {
-			taskInstances.addAll(client.findTaskEvents("human-tasks-management-kjar-1.0.0-SNAPSHOT", task.getId(), 0, 100));
-		}
-		return taskInstances;
-    }
+//	public List<TaskEventInstance> findAllPotentialPendingTaskEventInstances(String user) {
+//		List<TaskEventInstance> taskInstances = new ArrayList<>();
+//		UserTaskServicesClient client = kie.getUserTaskServicesClient();
+//		List<TaskSummary> tasks = client.findTasksAssignedAsPotentialOwner(user, 0, Integer.MAX_VALUE);
+//		for (TaskSummary task : tasks) {
+//			taskInstances.addAll(client.findTaskEvents("human-tasks-management-kjar-1.0.0-SNAPSHOT", task.getId(), 0, 100));
+//		}
+//		return taskInstances;
+//    }
 	
-	//Este método es por si en la descripción se le quiere pasar información extra de la tarea en fomra de JSON poder extraerla
+	/**
+	 * In case jBPM Task has Json format information in Description field this method extract its and return in Map format.
+	 * @param taskDescription
+	 * @return Map<String, String>
+	 * @throws JsonMappingException
+	 * @throws JsonProcessingException
+	 */
+//	Este método es por si en la descripción se le quiere pasar información extra de la tarea en fomra de JSON poder extraerla
+//	Por ejemplo:
+//	{
+//	  "metadata": {
+//		 "type": "consulta",
+//		 "campoExtra": "info extra",
+//		 "prioridad": "99"
+//	   }
+//	}
 	private Map<String, String> extractMetadataJson(String taskDescription) throws JsonMappingException, JsonProcessingException {
         int start = taskDescription.indexOf('{');
         int end = taskDescription.lastIndexOf('}');

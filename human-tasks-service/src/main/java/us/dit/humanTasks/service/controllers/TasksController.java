@@ -51,7 +51,13 @@ public class TasksController {
 	
 	//@Autowired
 	//private ReviewService review;
-		
+	
+	/**
+	 * Shows the main tasks page
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
 	@GetMapping()
 	public String TasksSelection(HttpSession session, Model model) {
 		//Esto está aquí para iniciar las tareas.
@@ -61,6 +67,12 @@ public class TasksController {
 		return "tasks";
 	}
 	
+	/**
+	 * Shows the assignedTasks page
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
 	@GetMapping("/assignedTasks")
 	public String getAssignedTasks(HttpSession session, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -70,6 +82,12 @@ public class TasksController {
 		return "assignedTasks";
 	}
 	
+	/**
+	 * Shows the potentialTasks page
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
 	@GetMapping("/potentialTasks")
 	public String getPotentialTasks(HttpSession session, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -79,6 +97,14 @@ public class TasksController {
 		return "potentialTasks";
 	}
 	
+	/**
+	 * Manage the claim action from potentialTasks page
+	 * @param taskId
+	 * @param containerId
+	 * @param processInstanceId
+	 * @param model
+	 * @return RedirectView
+	 */
 	@PostMapping("/claim")
     public RedirectView claimTask(@RequestParam("taskId") Long taskId, @RequestParam("containerId") String containerId, 
     		@RequestParam("processInstanceId") Long processInstanceId, Model model) {
@@ -91,6 +117,15 @@ public class TasksController {
         return new RedirectView("/tasks/potentialTasks");
     }
 	
+	/**
+	 * Manage the start action from AssignedTasks page.
+	 * @param taskId
+	 * @param actualOwner
+	 * @param containerId
+	 * @param processInstanceId
+	 * @param redirectAttributes
+	 * @return RedirectView
+	 */
 	@PostMapping("/start")
     public RedirectView startTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId,
     		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {     
@@ -101,6 +136,15 @@ public class TasksController {
         return new RedirectView("/questionnaire");
     }
 	
+	/**
+	 * Manage the continue action from AssignedTasks page
+	 * @param taskId
+	 * @param actualOwner
+	 * @param containerId
+	 * @param processInstanceId
+	 * @param redirectAttributes
+	 * @return RedirectView
+	 */
 	@PostMapping("/continue")
     public RedirectView continueTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
     		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {
@@ -111,6 +155,15 @@ public class TasksController {
         return new RedirectView("/questionnaire");
     }
 	
+	/**
+	 * Manage the reject action from AssignedTasks page
+	 * @param taskId
+	 * @param actualOwner
+	 * @param containerId
+	 * @param processInstanceId
+	 * @param model
+	 * @return RedirectView
+	 */
 	@PostMapping("/reject")
     public RedirectView rejectTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
     		@RequestParam("processInstanceId") Long processInstanceId, Model model) {

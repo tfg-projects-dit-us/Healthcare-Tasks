@@ -27,6 +27,12 @@ import org.hl7.fhir.r5.model.Task.TaskInputComponent;
 public class QuestionnaireDAO {
 	private static final Logger logger = LogManager.getLogger();
 	
+	/**
+	 * Find Questionnaire resource from FHIR Task id.
+	 * @param taskId
+	 * @param serverBase
+	 * @return Questionnaire
+	 */
 	public Questionnaire getQuestionnaireFromTask(String taskId, String serverBase) {
 		try {
 			logger.info("Buscar task por Id para buscar el questionnaire a partir de la task");

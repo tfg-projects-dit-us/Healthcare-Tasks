@@ -30,6 +30,13 @@ public class QuestionnaireController {
 	@Autowired
 	QuestionnaireDAO questionnaireDAO;
 	
+	/**
+	 * Obtaine the questionnaire from FHIR Task id and return the Questionnaire page.
+	 * @param taskId
+	 * @param taskURI
+	 * @param model
+	 * @return String
+	 */
 	@GetMapping() 
 	public String getQuestionnaire(@RequestParam("taskId") String taskId, @RequestParam("taskURI") String taskURI, Model model) {
 		logger.info("Entro en getQuestionnaire del controlador Http");	
