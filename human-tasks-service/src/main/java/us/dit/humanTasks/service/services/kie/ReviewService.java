@@ -32,7 +32,7 @@ public class ReviewService {
 	private String rolP="HumanTasksManagement.TareaARol";
 	private String userP="HumanTasksManagement.TareaAOtroRole";
 	/**
-	 * Instancia un proceso con una tarea humana asignada al rol wbadmin
+	 * Instancia un proceso con una tarea humana asignada al rol kie-server
 	 * @return el id del proceso instanciado
 	 */
 	public Long newTareaARol() {
