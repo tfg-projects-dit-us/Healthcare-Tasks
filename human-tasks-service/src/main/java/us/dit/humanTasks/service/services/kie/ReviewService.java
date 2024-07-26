@@ -4,52 +4,62 @@ package us.dit.humanTasks.service.services.kie;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hl7.fhir.r5.model.Questionnaire;
+
 import org.kie.server.client.ProcessServicesClient;
-import org.kie.server.api.model.instance.WorkItemInstance;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
-import us.dit.humanTasks.service.services.fhir.FhirClient;
+
 
 /**
- * ESTE SERVICIO DESAPARECERÁ, ES SÓLO PARA PRUEBAS
+ * ESTE SERVICIO ES PARA TESTS, PERMITE INSTANCIAR PROCESOS CON TAREAS HUMANAS
  */
 @Service
 public class ReviewService {
 
 	private static final Logger logger = LogManager.getLogger();
-
+	
 	@Autowired
 	private KieUtilService kie;
 	
-	@Autowired
-	private FhirClient fhir;
-	
-	private String containerId="human-tasks-kjar-1_0-SNAPSHOT";
-	private String processId="consentimientos-kjar.solicitudConsentimiento";
-	
-	private String containerId2="human-tasks-management-kjar-1.0.0-SNAPSHOT";
-	//private String processId2="human-tasks-management.TareaAUsuario";
-	//private String processId2="HumanTasksManagement.TareaAOtroRole";
-	private String processId2="HumanTasksManagement.TareaARol";
-	
-	public Long newInstance2(String principal) {
+	private String containerId="human-tasks-management-kjar-1.0.0-SNAPSHOT";
+	private String rolP="HumanTasksManagement.TareaARol";
+	private String userP="HumanTasksManagement.TareaAOtroRole";
+	/**
+	 * Instancia un proceso con una tarea humana asignada al rol wbadmin
+	 * @return el id del proceso instanciado
+	 */
+	public Long newTareaARol() {
 		Map<String,Object> variables= new HashMap<String,Object>();
-        logger.info("Entro en newInstance");
-	    variables.put("taskURI", "758873");
-	    //variables.put("user", principal);
+        logger.info("Entro en newTareaARol");
+	    variables.put("taskURI", "758873");	  
 		ProcessServicesClient client = kie.getProcessServicesClient();
-		Long idInstanceProcess = client.startProcess(containerId2, processId2,variables);
-		logger.info("conseguido??? " + idInstanceProcess.toString());
+		Long idInstanceProcess = client.startProcess(containerId, rolP,variables);
+		logger.info("Instanciado proceso " + idInstanceProcess.toString());
 		return idInstanceProcess;
 	}
-	
+	/**
+	 * Instancia un proceso con una tarea humana asignada al usuario que se pase como parámetro
+	 * @param principal usuario al que se le asigna la tarea
+	 * @return el id del proceso instanciado
+	 */
+	public Long newTareaAUsuario(String principal) {
+		Map<String,Object> variables= new HashMap<String,Object>();
+        logger.info("Entro en newTareaAUsuario");
+	    variables.put("taskURI", "758873");
+	    variables.put("user", principal);
+		ProcessServicesClient client = kie.getProcessServicesClient();
+		Long idInstanceProcess = client.startProcess(containerId, userP,variables);
+		logger.info("Instanciado proceso " + idInstanceProcess.toString());
+		return idInstanceProcess;
+	}
+	/*
 	public Questionnaire initTask2(HttpSession session) {
 		logger.info("Entro en init task con processId: "+processId2);
 		WorkItemInstance wi=findNextTask((Long)session.getAttribute("processId2"));
@@ -90,4 +100,5 @@ public class ReviewService {
 		logger.info("WI: "+wi.toString());		
 		return wi;
 	}
+	*/
 }

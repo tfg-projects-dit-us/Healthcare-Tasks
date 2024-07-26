@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Task;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ import us.dit.humanTasks.service.services.kie.ReviewService;
 @Controller
 @RequestMapping("/tasks")
 public class TasksController {
-	
+	private static final Logger logger = LogManager.getLogger();
 	//Nombre del parámetro de entrada del workItemHandler que contiene el ID de la tarea fhir
 	private static final String TASK_URI = "taskURI";
 	
@@ -49,8 +51,8 @@ public class TasksController {
 	@Autowired
 	private FhirTasksDAO fhirDao;
 	
-	//@Autowired
-	//private ReviewService review;
+	@Autowired
+	private ReviewService review;
 	
 	/**
 	 * Shows the main tasks page
@@ -172,4 +174,32 @@ public class TasksController {
         fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.READY);
         return new RedirectView("/tasks/assignedTasks");
     }
+	
+	/**
+	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al usuario que lo invoca
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
+	@GetMapping("/initTareaAUsuario")
+	public String TestAUsu() {
+		logger.info("entro en /initTareaAUsuario");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails principal = (UserDetails) auth.getPrincipal();
+		review.newTareaAUsuario(principal.getUsername());
+		return "tasks";
+	}
+	
+	/**
+	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al rol webadmin
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
+	@GetMapping("/initTareaARol")
+	public String TestARol() {	
+		logger.info("entro en /initTareaARol");
+		review.newTareaARol();
+		return "tasks";
+	}
 }

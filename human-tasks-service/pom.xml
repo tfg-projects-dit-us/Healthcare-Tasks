@@ -120,7 +120,7 @@
   	</dependency>
   	<dependency>
   		<groupId>us.dit</groupId>
-  		<artifactId>consentimientos-model</artifactId>
+  		<artifactId>human-tasks-model</artifactId>
   		<version>1.0-SNAPSHOT</version>
   	</dependency>
   </dependencies>

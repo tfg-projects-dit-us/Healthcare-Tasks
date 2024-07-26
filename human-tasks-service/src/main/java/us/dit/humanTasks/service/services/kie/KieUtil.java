@@ -12,9 +12,12 @@ import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.client.admin.UserTaskAdminServicesClient;
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-//import org.springframework.stereotype.Service;
+
+
 /**
  * Esta clase debe contener los servicios que proporcionan capacidades para
  * interaccionar con el kie server Debe ser el único responsable de estos
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
  * componente spring, para poder inyectarlo en todos aquellos que lo necesiten,
  * especialmente servicios
  */
+
 @Service
 public class KieUtil implements KieUtilService {
 	@Value("${kieserver.location}")

@@ -14,7 +14,7 @@
       </config-item>
       <config-item>
         <name>org.kie.server.user</name>
-        <value>consentimientos</value>
+        <value>admin</value>
         <type>java.lang.String</type>
       </config-item>
       <config-item>
@@ -34,7 +34,7 @@
       </config-item>
       <config-item>
         <name>org.kie.server.pwd</name>
-        <value>consentimientos</value>
+        <value>admin</value>
         <type>java.lang.String</type>
       </config-item>
     </configItems>

@@ -12,7 +12,7 @@ if "%*" == "" (
 
 	cd ..
 
-	for %%s in ("-model" "human-tasks-management-kjar" "human-tasks-service") do (
+	for %%s in ("human-tasks-model" "human-tasks-management-kjar" "human-tasks-service") do (
 
 			cd *%%s
 			echo ===============================================================================
