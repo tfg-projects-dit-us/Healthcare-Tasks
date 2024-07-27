@@ -27,7 +27,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import us.dit.humanTasks.service.model.FhirTasksDAO;
 import us.dit.humanTasks.service.model.TasksDAO;
-import us.dit.humanTasks.service.services.kie.ReviewService;
+import us.dit.humanTasks.service.services.kie.TestService;
 
 /**
  * @author Marco Antonio Maldonado Orozco
@@ -52,7 +52,7 @@ public class TasksController {
 	private FhirTasksDAO fhirDao;
 	
 	@Autowired
-	private ReviewService review;
+	private TestService test;
 	
 	/**
 	 * Shows the main tasks page
@@ -186,7 +186,7 @@ public class TasksController {
 		logger.info("entro en /initTareaAUsuario");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		review.newTareaAUsuario(principal.getUsername());
+		test.newTareaAUsuario(principal.getUsername());
 		return "tasks";
 	}
 	
@@ -199,7 +199,7 @@ public class TasksController {
 	@GetMapping("/initTareaARol")
 	public String TestARol() {	
 		logger.info("entro en /initTareaARol");
-		review.newTareaARol();
+		test.newTareaARol();
 		return "tasks";
 	}
 }
