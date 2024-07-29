@@ -6,7 +6,10 @@
 ![GitHub watchers](https://img.shields.io/github/watchers/tfg-projects-dit-us/Healthcare-Tasks)
 ![GitHub](https://img.shields.io/github/license/tfg-projects-dit-us/Healthcare-Tasks)
 
+
 <img src="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/resources/img/tareas-diarias.png" width="200" />
+
+
 # Healthcare Tasks: Human task management in healthcare contexts
 
 Este proyecto es una aplicación de negocios jBPM con Spring Boot.
