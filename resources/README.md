@@ -48,13 +48,12 @@ test.roleprocess=HumanTasksManagement.TareaARol
 test.userprocess=human-tasks-management.TareaAUsuario
 ```
 ## Instanciar los procesos de test
-Para poder crear instancias de estos procesos la aplicación publica dos endpoint que atienden peticiones get, están definidos en la clase `TasksController`
+Para poder crear instancias de estos procesos la aplicación publica dos endpoint que atienden peticiones get, están definidos en la clase `TestController`
 
-* `/tasks/initTareaARole`: arranca una instancia del proceso `TareaARole`
-* `/tasks/initTareaAUsuario`: arranca una isntancia del proceso `TareaAUsuario`
+* `/test/initTareaARol`: arranca una instancia del proceso `TareaARole`
+* `/test/initTareaAUsuario`: arranca una isntancia del proceso `TareaAUsuario`
 
 Estos endpoint son sólo para facilitar las pruebas y deberán desaparecer en la versión en producción.
-TODO: crear una clase controladora específica para las pruebas, y que no estén dentro del controlador de tareas
 
 ## Cierre de sesión
 
