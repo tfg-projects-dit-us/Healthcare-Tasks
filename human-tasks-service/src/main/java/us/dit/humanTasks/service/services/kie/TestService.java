@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 import org.kie.server.client.ProcessServicesClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -45,10 +45,18 @@ public class TestService {
 	
 	@Autowired
 	private KieUtilService kie;
-	
-	private String containerId="human-tasks-management-kjar-1.0.0-SNAPSHOT";
-	private String rolP="HumanTasksManagement.TareaARol";
-	private String userP="human-tasks-management.TareaAUsuario";
+
+	@Value("${test.taskid}")
+	private String taskId;
+
+	@Value("${test.containerid}")
+	private String containerId;
+
+	@Value("${test.roleprocess}")
+	private String rolP;
+
+	@Value("${test.userprocess}")		
+	private String userP;
 	/**
 	 * Instancia un proceso con una tarea humana asignada al rol kie-server
 	 * @return el id del proceso instanciado
@@ -56,7 +64,7 @@ public class TestService {
 	public Long newTareaARol() {
 		Map<String,Object> variables= new HashMap<String,Object>();
         logger.info("Entro en newTareaARol");
-	    variables.put("taskURI", "758873");	  
+	    variables.put("taskURI", taskId);	  
 		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, rolP,variables);
 		logger.info("Instanciado proceso " + idInstanceProcess.toString());
@@ -70,7 +78,7 @@ public class TestService {
 	public Long newTareaAUsuario(String principal) {
 		Map<String,Object> variables= new HashMap<String,Object>();
         logger.info("Entro en newTareaAUsuario");
-	    variables.put("taskURI", "758873");
+	    variables.put("taskURI", taskId);
 	    variables.put("user", principal);
 		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, userP,variables);
