@@ -1,10 +1,10 @@
-![GitHub top Language](https://img.shields.io/github/languages/top/tfg-projects-dit-us/healthcare-tasks)
-![GitHub forks](https://img.shields.io/github/forks/tfg-projects-dit-us/healthcare-tasks?style=social)
-![GitHub contributors](https://img.shields.io/github/contributors/tfg-projects-dit-us/healthcare-tasks)
-![GitHub Repo stars](https://img.shields.io/github/stars/tfg-projects-dit-us/healthcare-tasks?style=social)
-![GitHub repo size](https://img.shields.io/github/repo-size/tfg-projects-dit-us/healthcare-tasks)
-![GitHub watchers](https://img.shields.io/github/watchers/tfg-projects-dit-us/healthcare-tasks)
-![GitHub](https://img.shields.io/github/license/tfg-projects-dit-us/healthcare-tasks)
+![GitHub top Language](https://img.shields.io/github/languages/top/tfg-projects-dit-us/Healthcare-Tasks)
+![GitHub forks](https://img.shields.io/github/forks/tfg-projects-dit-us/Healthcare-Tasks?style=social)
+![GitHub contributors](https://img.shields.io/github/contributors/tfg-projects-dit-us/Healthcare-Tasks)
+![GitHub Repo stars](https://img.shields.io/github/stars/tfg-projects-dit-us/Healthcare-Tasks?style=social)
+![GitHub repo size](https://img.shields.io/github/repo-size/tfg-projects-dit-us/Healthcare-Tasks)
+![GitHub watchers](https://img.shields.io/github/watchers/tfg-projects-dit-us/Healthcare-Tasks)
+![GitHub](https://img.shields.io/github/license/tfg-projects-dit-us/Healthcare-Tasks)
 # Healthcare Tasks: Human task management in healthcare contexts
 
 Este proyecto es una aplicación de negocios jBPM con Spring Boot.
