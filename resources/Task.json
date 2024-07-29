@@ -1,11 +1,5 @@
 {
   "resourceType": "Task",
-  "id": "765034",
-  "meta": {
-    "versionId": "1",
-    "lastUpdated": "2024-07-26T16:53:07.266+00:00",
-    "source": "#bMHiUIIoA9E6RAwy"
-  },
   "status": "ready",
   "intent": "order",
   "input": [ {
@@ -16,6 +10,6 @@
       } ],
       "text": "Id del cuestionario de cierre de la tarea"
     },
-    "valueString": "758872"
+    "valueString": "765063"
   } ]
 }
