@@ -5,6 +5,8 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/tfg-projects-dit-us/Healthcare-Tasks)
 ![GitHub watchers](https://img.shields.io/github/watchers/tfg-projects-dit-us/Healthcare-Tasks)
 ![GitHub](https://img.shields.io/github/license/tfg-projects-dit-us/Healthcare-Tasks)
+
+<img src="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/resources/img/tareas-diarias.png" width="200" />
 # Healthcare Tasks: Human task management in healthcare contexts
 
 Este proyecto es una aplicación de negocios jBPM con Spring Boot.
@@ -59,3 +61,6 @@ If you have a suggestion that would make this better, please fork the repo and c
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+**Graphical design**
+- Icon created by Eucalyp-Flaticon <a href="https://www.flaticon.es/iconos-gratis/planificacion" title="planificación iconos"> Planificación iconos, creados por Eucalyp - Flaticon </a>
