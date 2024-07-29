@@ -2,7 +2,9 @@
 
 En este paquete encontrará diversos recursos para facilitarle la tarea de configuración del entorno de desarrollo y pruebas
 
-## Servidores de respaldo: FHIR
+## Servidores de respaldo:
+
+### FHIR
 
 Esta aplicación utiliza un servidor FHIR para persistir y consultar los cuestionarios y tareas FHIR, maneja los recursos `Questionnaire`, `Task` y `QuestionnaireResponse`
 
@@ -30,6 +32,30 @@ En futuras versiones de esta solución este procedimiento será automático y no
 Tras realizar pruebas podrá recuperarse la tarea y se observará que se ha añadido la respuesta del cuestionario de cierre en las salidas. Es necesario tener en cuenta que dado que todas las tareas que se crean en las pruebas usan el mismo recurso el campo de salida de la tarea irá acumulando referencias a respuestas. Lógicamente este comportamiento cambiará en próximas versiones.
 
 Puede usar el identificador de tarea actualmente configurado, siempre que en el backend no se haya realizado una limpieza tras la publicación de este documento de ayuda.
+
+### Base de datos
+
+La información de seguimiento de los procesos de almacena en una base de datos. La configuración de la misma se realiza también en el fichero `application.properties`.
+
+En la configuración proporcionada se utiliza una base de datos local postgresql, de nombre ht
+
+```
+#data source configuration
+spring.datasource.username=jbpm
+spring.datasource.password=jbpm.2.DDBB*
+spring.datasource.url=jdbc:postgresql://localhost:5432/ht
+spring.datasource.driver-class-name=org.postgresql.xa.PGXADataSource
+
+#hibernate configuration
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.show_sql=false
+spring.jpa.properties.hibernate.hbm2ddl.auto=update
+spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+```
+
+Es necesario que la base de datos esté creada, y configurar adecuadamente este fichero para incluir el usuario y password de la misma.
+
+Se presenta también la configuración necesaria para jpa, api utilizada para la persistencia, cuando se utiliza postgresql.
 
 ## Procesos de test
 
