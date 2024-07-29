@@ -10,7 +10,7 @@ Esta aplicación utiliza un servidor FHIR para persistir y consultar los cuestio
 
 El servidor FHIR de respaldo se configura en el archivo `application.properties` del servicio. Por defecto se utiliza el <a href="https://hapi.fhir.org/baseR5/swagger-ui/">servidor de test, versión R5,</a> de Hapi Fhir, iniciativa respaldada por <a href="https://www.smiledigitalhealth.com/">Smile Digital</a>  
 
-El servidor aloja los recursos `Task` asociados a una tarea humana en el proceso. La versión actual de los procesos de prueba no genera estos recursos, por los que deben encontrarse previamente en el servidor. Del mismo modo la versión actual de los procesos no generan los recursos `Questionnaire` que representan los datos solicitados al usuario para cerrar la tarea, por lo que también deben estar previamente alojados en el servidor.
+El servidor aloja los recursos `Task` asociados a una tarea humana en el proceso. La versión actual de los procesos de prueba no genera estos recursos, por lo que deben encontrarse previamente en el servidor. Del mismo modo la versión actual de los procesos no generan los recursos `Questionnaire` que representan los datos solicitados al usuario para cerrar la tarea, por lo que también deben estar previamente alojados en el servidor.
 
 Los json proporcionados en este paquete (`Questionnaire.json` y `Task.json`) son ejemplos de estos recursos, y deben estar almacenados previamente en el servidor FHIR. Para ello deberá:
 
@@ -35,9 +35,9 @@ Puede usar el identificador de tarea actualmente configurado, siempre que en el 
 
 ### Base de datos
 
-La información de seguimiento de los procesos de almacena en una base de datos. La configuración de la misma se realiza también en el fichero `application.properties`.
+La información de seguimiento de los procesos se almacena en una base de datos. La configuración de la misma se realiza también en el fichero `application.properties`.
 
-En la configuración proporcionada se utiliza una base de datos local postgresql, de nombre ht
+En la configuración proporcionada se utiliza una base de datos local postgresql, de nombre `ht`
 
 ```
 #data source configuration
@@ -55,7 +55,7 @@ spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.Ph
 
 Es necesario que la base de datos esté creada, y configurar adecuadamente este fichero para incluir el usuario y password de la misma.
 
-Se presenta también la configuración necesaria para jpa, api utilizada para la persistencia, cuando se utiliza postgresql.
+Se presenta también la configuración necesaria para JPA, api utilizada para la persistencia, cuando se utiliza postgresql.
 
 ## Procesos de test
 
@@ -64,7 +64,8 @@ management", incluido en esta distribución en el paquete human-tasks-management
 * <a href="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/human-tasks-management-kjar/src/main/resources/HumanTasksManagement.TareaARol-svg.svg">TareaARole</a>: que crea una tarea ligada al rol webadmin, de modo que cualquier usuario con este rol podrá reclamarla y ejecutarla
 * <a href="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/human-tasks-management-kjar/src/main/resources/HumanTasksManagement.TareaAUsuario-svg.svg">TareaAUsuario</a>: que crea una tarea asignada al usuario que cree la instancia
 
-Dado que el servicio está desarrollado como una aplicación de negocios con un motor kie embebido, en el que al arrancar la aplicación se cargará un contenedor con estos procesos disponibles. La información necesaria para realizar los tests (id del contenedor y de los procesos) se hace en el fichero de propiedades de la aplicación:
+Dado que el servicio está desarrollado como una aplicación de negocios con un motor kie embebido, al arrancar la aplicación se cargará un contenedor con estos procesos disponibles. La información necesaria para realizar los tests (id del contenedor y de los procesos) se configura en el fichero de propiedades de la aplicación:
+
 ```
 #nombre del contenedor desplegado en el servidor kie
 test.containerid=human-tasks-management-kjar-1.0.0-SNAPSHOT
