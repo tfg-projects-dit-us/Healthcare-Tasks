@@ -1,5 +1,5 @@
 # Servicio Gestión de tareas humanas
-El componente "human-tasks-service" contiene la aplicación de negocio del proyecto para la gestión de tareas huamanas en procesos jBPM
+El componente "human-tasks-service" contiene la aplicación de negocio del proyecto para la gestión de tareas humanas en procesos jBPM
 ## Tecnologías
 Utiliza Spring boot 2 y jBPM (kie server 7.74.1.Final)
 ## Generación

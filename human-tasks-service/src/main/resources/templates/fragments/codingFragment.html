@@ -1,3 +1,22 @@
+<!--
+
+*  This file is part of Healthcare Tasks: Human task management in healthcare contexts.
+*  Copyright (C) 2024  Universidad de Sevilla/Departamento de Ingeniería Telemática
+*
+*  Healthcare Tasks is free software: you can redistribute it and/or
+*  modify it under the terms of the GNU General Public License as published
+*  by the Free Software Foundation, either version 3 of the License, or (at
+*  your option) any later version.
+*
+*  Healthcare Tasks is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+*  Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License along
+*  with Healthcare Tasks. If not, see <https://www.gnu.org/licenses/>.
+
+-->
 <!-- Autor: Marco Antonio Maldonado Orozco -->
 <!--Pregunta con respuesta/s de tipo coding (Hay más anotaciones dentro del mismo código)
 	1. La pregunta tiene una sola respuesta
@@ -28,9 +47,9 @@
 			varias respuesta usando la tecla CTRL. -->
 	<div th:fragment="coding"  class="coding-container">
 		<label th:id="${item.linkId + '-title'}" th:text="${item.text}" class="question-title"/>
-		<!--  Presentaci�n de las answerOption incluidas en la pregunta -->
+		<!--  Presentaci n de las answerOption incluidas en la pregunta -->
 		<span th:id="codingAnswerOptions" th:if="${item.answerOption!=null}">
-			<!-- CASO 2: Verifica si item.repeats es true o false, si est� permitida una o varias respuestas-->
+			<!-- CASO 2: Verifica si item.repeats es true o false, si est  permitida una o varias respuestas-->
 			<span th:if="${item.repeats}" th:required="${item.required}">
 				<!-- CASO 2.1 Si item.repeats es true, permite elegir múltiples opciones -->
 				 <th:block th:if="${#lists.size(item.answerOption) <= 3}">
