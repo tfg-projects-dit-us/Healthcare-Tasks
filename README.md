@@ -27,7 +27,7 @@ This project is licensed under the terms of the [GNU General Public License (GPL
 Este proyecto es el resultado del trabajo desarrollado por los alumnos que a continuación se mencionan, bajo la supervisión de la profesora Isabel Román Martínez.
 
 **Autores:**
-- Marco Antonio Madonado: desarrolla en su TFG la versión actual del proyecto
+- Marco Antonio Madonado Orozco: desarrolla en su TFG la versión actual del proyecto
 
 **Supervisora:**
 - Isabel Román Martínez, Profesora del Departamento de Ingeniería Telemática de la Universidad de Sevilla

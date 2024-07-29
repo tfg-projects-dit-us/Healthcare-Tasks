@@ -6,7 +6,7 @@ En este paquete encontrará diversos recursos para facilitarle la tarea de confi
 
 Esta aplicación utiliza un servidor FHIR para persistir y consultar los cuestionarios y tareas FHIR, maneja los recursos `Questionnaire`, `Task` y `QuestionnaireResponse`
 
-El servidor FHIR de respaldo se configura en el archivo application.properties del servicio. Por defecto se utiliza el <a href="https://hapi.fhir.org/baseR5/swagger-ui/">servidor de test, versión R5,</a> de Hapi Fhir, iniciativa respaldada por <a href="https://www.smiledigitalhealth.com/">Smile Digital</a>  
+El servidor FHIR de respaldo se configura en el archivo `application.properties` del servicio. Por defecto se utiliza el <a href="https://hapi.fhir.org/baseR5/swagger-ui/">servidor de test, versión R5,</a> de Hapi Fhir, iniciativa respaldada por <a href="https://www.smiledigitalhealth.com/">Smile Digital</a>  
 
 El servidor aloja los recursos `Task` asociados a una tarea humana en el proceso. La versión actual de los procesos de prueba no genera estos recursos, por los que deben encontrarse previamente en el servidor. Del mismo modo la versión actual de los procesos no generan los recursos `Questionnaire` que representan los datos solicitados al usuario para cerrar la tarea, por lo que también deben estar previamente alojados en el servidor.
 
@@ -32,19 +32,19 @@ management", incluido en esta distribución en el paquete human-tasks-management
 * <a href="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/human-tasks-management-kjar/src/main/resources/HumanTasksManagement.TareaAUsuario-svg.svg">TareaAUsuario</a>: que crea una tarea asignada al usuario que cree la instancia
 
 Dado que el servicio está desarrollado como una aplicación de negocios con un motor kie embebido, en el que al arrancar la aplicación se cargará un contenedor con estos procesos disponibles. La información necesaria para realizar los tests (id del contenedor y de los procesos) se hace en el fichero de propiedades de la aplicación:
-
+```
 #nombre del contenedor desplegado en el servidor kie
 test.containerid=human-tasks-management-kjar-1.0.0-SNAPSHOT
 #nombre del proceso que contiene una tarea asignada al role wbadmin
 test.roleprocess=HumanTasksManagement.TareaARol
 #nombre del proceso que asigna una tarea al usuario que lo inicia
 test.userprocess=human-tasks-management.TareaAUsuario
-
+```
 ## Instanciar los procesos de test
 Para poder crear instancias de estos procesos la aplicación publica dos endpoint que atienden peticiones get, están definidos en la clase `TasksController`
 
-* /tasks/initTareaARole: arranca una instancia del proceso TareaARole
-* /tasks/initTareaAUsuario: arranca una isntancia del proceso TareaAUsuario
+* `/tasks/initTareaARole`: arranca una instancia del proceso `TareaARole`
+* `/tasks/initTareaAUsuario`: arranca una isntancia del proceso `TareaAUsuario`
 
 Estos endpoint son sólo para facilitar las pruebas y deberán desaparecer en la versión en producción.
 TODO: crear una clase controladora específica para las pruebas, y que no estén dentro del controlador de tareas
