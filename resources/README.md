@@ -14,7 +14,14 @@ Los json proporcionados en este paquete (`Questionnaire.json` y `Task.json`) son
 
 * Abrir en el navegador el servidor de test (R5) y seleccionar el recurso `Questionnaire`. Elegir en la operación Post la opción Try y adjuntar el questionnario proporcionado. La respuesta devolverá el recurso creado en el servidor, donde podemos encontrar su identificador ("id": "765063" en el ejemplo mostrado).
 
+<img src="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/resources/img/CrearQuestionnaire.jpg" width="500" />
+
+<img src="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/resources/img/RespuestaCreacionQuestionnaire.jpg" width="500" />
+
+
 * A continuación repetir la operación para el recurso Task. El fichero json proporcionado debe editarse para que el id del cuestionario de cierre sea el que se acaba de crear en el paso anterior. Una vez ejecutado el post el servidor devuelve el recurso creado, donde podemos encontrar su identificador ("id": "765064" en el ejemplo presentado)
+
+<img src="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/resources/img/CrearTask.jpg" width="500" />
 
 * Configurar el fichero application.properties y en la propiedad test.taskid poner el identificador de la tarea que acaba de crear en el paso anterior
 
