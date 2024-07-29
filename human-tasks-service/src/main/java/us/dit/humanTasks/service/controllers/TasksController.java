@@ -188,32 +188,5 @@ public class TasksController {
         fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.READY);
         return new RedirectView("/tasks/assignedTasks");
     }
-	
-	/**
-	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al usuario que lo invoca
-	 * @param session
-	 * @param model
-	 * @return String
-	 */
-	@GetMapping("/initTareaAUsuario")
-	public String TestAUsu() {
-		logger.info("entro en /initTareaAUsuario");
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UserDetails principal = (UserDetails) auth.getPrincipal();
-		test.newTareaAUsuario(principal.getUsername());
-		return "tasks";
-	}
-	
-	/**
-	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al rol webadmin
-	 * @param session
-	 * @param model
-	 * @return String
-	 */
-	@GetMapping("/initTareaARol")
-	public String TestARol() {	
-		logger.info("entro en /initTareaARol");
-		test.newTareaARol();
-		return "tasks";
-	}
+
 }
