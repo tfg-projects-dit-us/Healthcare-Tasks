@@ -46,7 +46,7 @@
 			las opciones posibles estarán representadas con un input de tipo select en lugar de checkbox, en este input se podrán seleccionar
 			varias respuesta usando la tecla CTRL. -->
 	<div th:fragment="coding"  class="coding-container">
-		<label th:id="${item.linkId + '-title'}" th:text="${item.text}" class="question-title"/>
+		<label th:id="${item.linkId + '-title'}" th:text="${item.text} + (${item.required} ? ' *' : '')" class="question-title"/>
 		<!--  Presentaci n de las answerOption incluidas en la pregunta -->
 		<span th:id="codingAnswerOptions" th:if="${item.answerOption!=null}">
 			<!-- CASO 2: Verifica si item.repeats es true o false, si est  permitida una o varias respuestas-->
