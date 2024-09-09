@@ -66,12 +66,12 @@ public class TestController {
 	 * @return String
 	 */
 	@GetMapping("/initTareaAUsuario")
-	public String TestAUsu() {
+	public RedirectView TestAUsu() {
 		logger.info("entro en /initTareaAUsuario");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
 		test.newTareaAUsuario(principal.getUsername());
-		return "tasks";
+		return new RedirectView("/tasks");
 	}
 	
 	/**
@@ -81,9 +81,9 @@ public class TestController {
 	 * @return String
 	 */
 	@GetMapping("/initTareaARol")
-	public String TestARol() {	
+	public RedirectView TestARol() {	
 		logger.info("entro en /initTareaARol");
 		test.newTareaARol();
-		return "tasks";
+		return new RedirectView("/tasks");
 	}
 }

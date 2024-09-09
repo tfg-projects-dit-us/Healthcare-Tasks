@@ -19,6 +19,6 @@
 -->
 <!-- Autor: Marco Antonio Maldonado Orozco -->
 <div th:fragment="attachment">
-	<label th:for="${item.linkId}" th:text="${item.text}" class="question-title"/>
+	<label th:for="${item.linkId}" th:text="${item.text} + (${item.required} ? ' *' : '')" class="question-title"/>
 	<input type="file" th:id="${item.linkId}" th:name="${item.linkId + '~attatchment'}" th:required="${item.required}" th:multiple="${item.repeats}" />
 </div>

@@ -26,7 +26,7 @@
 			En este caso se crea un input de tipo url que comprueba que la url debe contener la palabra "fhir" para garantizar que es
 			un recurso. Además si hay varias respuestas posibles se habilitará un botón que añadirá más inputs con las mismas características. -->
 <div th:fragment="reference">
-	<label th:text="${item.text}" class="question-title"/>
+	<label th:text="${item.text} + (${item.required} ? ' *' : '')" class="question-title"/>
 	<th:block th:if="${item.answerOption != null and not #lists.isEmpty(item.answerOption)}">
 	    <select th:id="${item.linkId + '~select'}" th:name="${item.linkId + '~reference'}" th:required="${item.required}" th:multiple="${item.repeats}">
 	        <option th:each="option : ${item.answerOption}"

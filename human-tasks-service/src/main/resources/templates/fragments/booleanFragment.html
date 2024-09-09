@@ -23,7 +23,7 @@
 		<!-- La label es para englobar el checkbox y el texto y el check se marque también cuando se clica el texto-->		
 		<label>
 			<input type="checkbox" th:name="${item.linkId + '~boolean'}" th:required="${item.required}" th:disabled="${item.readOnly}" />
-			<span th:text="${item.text}"/>
+			<span th:text="${item.text} + (${item.required} ? ' *' : '')"/>
 		</label>
 	</div>
 </div>
