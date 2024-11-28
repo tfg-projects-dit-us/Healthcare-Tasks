@@ -17,6 +17,8 @@
 **/
 package us.dit.humanTasks.service.controllers;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -28,6 +30,7 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -65,11 +68,9 @@ public class TasksController {
 	@Autowired
 	private FhirTasksDAO fhirDao;
 	
-	@Autowired
-	private TestService test;
-	
 	/**
 	 * Shows the main tasks page
+	 * Menu to main options related to taks management
 	 * @param session
 	 * @param model
 	 * @return String
@@ -128,6 +129,7 @@ public class TasksController {
 		UserDetails principal = (UserDetails) auth.getPrincipal();
 		String user = principal.getUsername();
 		taskDao.claimTask(taskId, user, containerId);
+		
 		String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId);
 		fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.REQUESTED);
         return new RedirectView("/tasks/potentialTasks");
@@ -145,8 +147,10 @@ public class TasksController {
 	@PostMapping("/start")
     public RedirectView startTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId,
     		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {     
+		
 		String taskURI = taskDao.startTask(taskId, actualOwner, containerId, processInstanceId);
 		fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.INPROGRESS);
+		logger.debug("Metiendo en el contexto TASK_URI "+ taskURI+" y TASK_ID "+ taskId);
 		redirectAttributes.addAttribute(TASK_ID, taskId);
         redirectAttributes.addAttribute(TASK_URI, taskURI);
         return new RedirectView("/questionnaire");
@@ -188,5 +192,21 @@ public class TasksController {
         fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.READY);
         return new RedirectView("/tasks/assignedTasks");
     }
+	
+	//Este método se ha usado para la verificación de la seguridad, se comenta pero se deja por si fuera necesario en otro momento
+	//Lo que hace es devolver un listado de los roles asignados a un usuario
+	/*
+	 private List<String> getRoles(UserDetails userDetails) {
+	        // Obtener las autoridades (roles) asociadas al UserDetails
+	        
+		 Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+		 List<String> roles= new ArrayList<String>();
+		 for(GrantedAuthority auth: authorities) {
+			 roles.add(auth.toString());
+		 }	     
+	        return roles;
+	                         
+	    }
+	*/
 
 }

@@ -1,0 +1,53 @@
+{
+  "$comment": "Tarea principal para la gestión de onsentimientos, iniciadora del proceso general SOLICITUD CONSENTIMIENTO",
+  "resourceType" : "Task",
+  "status" : "requested",
+  "intent" : "order",
+  "code" : {
+    "text" : "Instantiate"
+  },
+  "requestedPerformer" : [{
+   "coding": {
+				"system": "http://snomed.info/sct",
+				"code": "56397003",
+				"display": "Neurologist"
+			},
+    "text": "The practitioner requiring the consent",    
+   
+    "reference" : "Practitioner/2"
+  },
+    {"coding": {
+				"system": "http://snomed.info/sct",
+				"code": "116154003",
+				"display": "Patient"
+			},
+    "text": "Patient whose consent is required",    
+   
+    "reference" : "Patient/3"
+  },
+    {"coding": {
+				"system": "http://snomed.info/sct",
+				"code": "116154003",
+				"display": "Patient"
+			},
+    "text": "Patient whose consent is required",    
+   
+    "reference" : "Patient/4"
+  }
+],  
+    "input": [ 
+	{
+    "$comment": "Se debe indicar el metacuestionnario que se va utilizar, si lo fija el inicador, si no se podría obtener del contexto del proceso. Según el TFG de Marco esto es el id del questionnaire, pero debería ser el link completo",
+    "type": {
+      "coding": [ {
+        "system": "http://terminology.hl7.org/CodeSystem/task-input-type",
+        "code": "closingQuestionnaire"
+      } ],
+      "text": "Id del cuestionario de cierre de la tarea"
+    },
+    "valueString": "1"
+  } ],
+   "output": [ 
+   {"$comment": "output questionnaireResponses y tareas de médico y pacientes (durante este proceso se crean: la respuesta al metacuestionario, un questionnaire para todos los pacientes, y un questionnarieResponse por cada paciente. mirar trabajo marco"}
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "$comment": "Tarea para la tarea del médico CONFIGURAR CONSENTIMIENTO. En el proceso sólo se crea una tarea de este tipo",
+  "resourceType" : "Task",
+  "id" : "xxxx",
+ 
+  "status" : "requested",
+  "intent" : "order",
+  "code" : {
+    "text" : "Instantiate"
+  },
+  "focus" : {
+    "reference" : "Consent"
+  },
+  "for" : {
+    "reference" : "Patient/f001"
+  },
+  "authoredOn" : "2016-03-10T22:39:32-04:00",
+  "lastModified" : "2016-03-10T22:39:32-04:00",
+  "requester" : {
+    "reference" : "Patient/example"
+  },
+  "requestedPerformer" : [{
+   "coding": {
+				"system": "http://snomed.info/sct",
+				"code": "56397003",
+				"display": "Neurologist"
+			},
+    "text": "The practitioner requiring the consent",    
+   
+    "reference" : "Practitioner/medico"
+  }
+],
+  "input" :[ 
+	{
+    "$comment": "Se debe indicar el metacuestionnario que se va utilizar, si lo fija el inicador, si no se podría obtener del contexto del proceso",
+    "type": {
+      "coding": [ {
+        "system": "http://terminology.hl7.org/CodeSystem/task-input-type",
+        "code": "closingQuestionnaire"
+      } ],
+      "text": "Id del cuestionario de cierre de la tarea"
+    },
+    "valueString": "METACUESTIONARIO"
+  } ],
+   "output": [ 
+  ]
+"$comment": "output: en esta tarea se crea la respuesta al metacuestionario"
+
+}

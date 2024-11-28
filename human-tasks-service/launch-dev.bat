@@ -1,5 +1,7 @@
 @echo off
 
+set "JAVA_HOME=D:\Programas\Java\jdk-11.0.8"
+rem set "JAVA_HOME=C:\Program Files\Java\jdk-11.0.4"
 set mavenInput="%*"
 
 if "%*" == "" (
@@ -12,7 +14,7 @@ if "%*" == "" (
 
 	cd ..
 
-	for %%s in ("-model" "-kjar" "consentimientos-service") do (
+	for %%s in ("human-tasks-model" "human-tasks-service") do (
 
 			cd *%%s
 			echo ===============================================================================
@@ -34,11 +36,12 @@ goto :startapp
 
 :startapp
 	echo "Launching the application in development mode - requires connection to controller (workbench)"
-    cd consentimientos-service
+    cd human-tasks-service
     cd target
     for /f "delims=" %%x in ('dir /od /b *.jar') do set latestjar=%%x
     cd ..
-    call java -Dspring.profiles.active=dev -jar target\%latestjar%
+rem call java -Dspring.profiles.active=dev -jar target\%latestjar%
+    call java -Dspring.profiles.active=dev --illegal-access=permit --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED -jar target\%latestjar%
 
 
 :end

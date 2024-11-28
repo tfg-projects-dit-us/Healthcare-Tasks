@@ -42,6 +42,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import us.dit.humanTasks.service.model.FhirTasksDAO;
 import us.dit.humanTasks.service.model.TasksDAO;
 import us.dit.humanTasks.service.services.kie.TestService;
+import us.dit.humanTasks.service.services.kie.KieUtilService;
 
 /**
  * @author Isabel Román Martínez
@@ -58,6 +59,8 @@ public class TestController {
 	@Autowired
 	private TestService test;
 	
+	@Autowired
+	private KieUtilService kie;
 	
 	/**
 	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al usuario que lo invoca
@@ -84,6 +87,22 @@ public class TestController {
 	public RedirectView TestARol() {	
 		logger.info("entro en /initTareaARol");
 		test.newTareaARol();
+		return new RedirectView("/tasks");
+	}
+	
+
+
+	/**
+	 * Método para test, permite enviar la señal ConsentRequest al motor kie, adjuntando el 
+	 */
+	@GetMapping("/sendConsentRequest")
+	public RedirectView sendSignal() {
+	
+		// Se envía la señal al motor KIE
+		logger.info("Enviando una señal al motor KIE");
+		//La tarea tiene que estar previametne creada en el servidor fhir local, puerto 8888
+		kie.sendSignal("ConsentRequest", "http://localhost:8888/fhir/Task/5");
+
 		return new RedirectView("/tasks");
 	}
 }

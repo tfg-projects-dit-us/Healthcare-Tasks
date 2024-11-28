@@ -17,7 +17,6 @@
 **/
 package us.dit.humanTasks.service.model;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -26,18 +25,17 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.kie.server.api.model.instance.TaskEventInstance;
+
+import org.jbpm.services.api.UserTaskService;
+
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.client.ProcessServicesClient;
+
 import org.kie.server.client.UserTaskServicesClient;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -45,6 +43,10 @@ import us.dit.humanTasks.service.services.kie.KieUtilService;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Isabel Román
+ * @version 19/12/2024
+ * Hacia el cambio para no usar kieutilservice, por ahora se usa UserTaskService donde es posible
+ * Las funciones no usadas se comentan
  */
 @Service
 public class TasksDAO {
@@ -53,8 +55,14 @@ public class TasksDAO {
 	
 	private static final String TASK_URI = "taskURI";
 	
+	//Se intentará eliminar kie y usar sólo rtDS
 	@Autowired
 	private KieUtilService kie;
+	
+//	@Autowired
+//	private RuntimeDataService rtDS;
+	@Autowired
+	private UserTaskService uTS;
 
 	/**
 	 * Find all jBPM tasks assigned and potential for user
@@ -110,11 +118,16 @@ public class TasksDAO {
 	 * @return String
 	 */
 	public String startTask(Long taskId, String user, String containerId, Long processInstanceId) {
-		UserTaskServicesClient client = kie.getUserTaskServicesClient();
+
 		logger.info("Comenzar la tarea con id " + taskId + " del contenedor con id " + containerId);
-		client.startTask(containerId, taskId, user);
-		Map<String, Object> inputData = getTaskInputContent(client, taskId, containerId, processInstanceId);
-        String taskURI = (String) inputData.get(TASK_URI);
+		uTS.start(taskId,user);
+	
+		Map<String, Object> inputData = uTS.getTaskInputContentByTaskId(taskId);
+		logger.info("La tarea "+taskId+" tiene como entrada "+inputData);
+		/**
+		 * Las tareas humanas tienen que tener una entrada TASK_URI en la que se pase la url de la tarea
+		 */
+		String taskURI=uTS.getTaskInputContentByTaskId(taskId).get(TASK_URI).toString();
         logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
         return taskURI;
 	}
@@ -128,10 +141,10 @@ public class TasksDAO {
 	 * @return
 	 */
 	public String continueTask(Long taskId, String user, String containerId, Long processInstanceId) {
-		UserTaskServicesClient client = kie.getUserTaskServicesClient();
+	
 		logger.info("Continuar la tarea con id " + taskId + " del contenedor con id " + containerId);
-		Map<String, Object> inputData = getTaskInputContent(client, taskId, containerId, processInstanceId);
-        String taskURI = (String) inputData.get(TASK_URI);
+		
+		String taskURI=uTS.getTaskInputContentByTaskId(taskId).get(TASK_URI).toString();
         logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
         return taskURI;
 	}
@@ -159,6 +172,7 @@ public class TasksDAO {
 		String containerId = taskInstance.getContainerId();
 		String user = taskInstance.getActualOwner();
 		logger.info("Completar la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
+
 		client.completeTask(containerId, taskId, user, new HashMap<>());
 	}
 	
@@ -170,29 +184,11 @@ public class TasksDAO {
 	 * @return
 	 */
 	public String getTaskURIFromTaskInputContent(Long taskId, String containerId, Long processInstanceId) {
-		UserTaskServicesClient client = kie.getUserTaskServicesClient();
-		Map<String, Object> inputData = getTaskInputContent(client, taskId, containerId, processInstanceId);
-        String taskURI = (String) inputData.get(TASK_URI);
+		logger.debug("Entrando en getTaskUri con taskId "+taskId+" containerId "+" processInstanceId "+processInstanceId);	
+        String taskURI = uTS.getTaskInputContentByTaskId(taskId).get(TASK_URI).toString();   
+		logger.debug("TaskURI con el cliente inyectado "+uTS.getTaskInputContentByTaskId(taskId).get("TASK_URL"));        
         return taskURI;
 	}
-	
-	/**
-	 * Finds the input content from jBPM Task with taskId
-	 * @param client
-	 * @param taskId
-	 * @param containerId
-	 * @param processInstanceId
-	 * @return
-	 */
-	private Map<String, Object> getTaskInputContent(UserTaskServicesClient client, Long taskId, String containerId, Long processInstanceId) {
-		ProcessServicesClient processClient = kie.getProcessServicesClient();
-		logger.info("Obtenemos las variables de entrada de la tarea " + taskId);
-		TaskInstance taskInstance = client.findTaskById(taskId);
-		WorkItemInstance workItem = processClient.getWorkItem(containerId, processInstanceId, taskInstance.getWorkItemId());
-		Map<String, Object> inputData = workItem.getParameters();
-		return inputData;
-	}
-	
 	
 	/************************PARA FUTURO******************************/
 	/**
@@ -210,7 +206,8 @@ public class TasksDAO {
 	}
 	
 	/**
-	 * Finds all pontential tasks ordered by type
+	 * TODO: aquí aparece el nombre de contenedor, esto no debería estar aquí....
+	 * Finds all potential tasks ordered by type
 	 * @param user
 	 * @return List<TaskSummary>
 	 */
@@ -275,6 +272,7 @@ public class TasksDAO {
 //		 "prioridad": "99"
 //	   }
 //	}
+	/*
 	private Map<String, String> extractMetadataJson(String taskDescription) throws JsonMappingException, JsonProcessingException {
         int start = taskDescription.indexOf('{');
         int end = taskDescription.lastIndexOf('}');
@@ -289,7 +287,6 @@ public class TasksDAO {
         }
 
         return new HashMap<>();
-    }
-	
-	
+    }	
+	*/
 }

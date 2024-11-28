@@ -1,0 +1,71 @@
+{  
+	  "$comment": "Médico encargado de solicitar el consentimiento",
+      "resourceType": "Practitioner",     
+      "active": true,
+      "name": [ {
+        "use": "official",
+        "family": "KAUFFMAN",
+        "given": [ "STEPHEN", "C" ]
+      } 
+	 ],
+	  "identifier": [
+  {
+	"$coment": "Identificador en el sistema, no se cuál de los dos sería mejor, si ACSN oo LR. Pongo ambos",
+    "type": {
+      "coding": [ {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+        "code": "ACSN",
+        "display": "Accession ID"
+      } ],
+      "text": "Login del sistema de myhospital"
+    },
+    "system": "bpm",
+    "value": "medico"
+  },{
+	"type": {
+    "coding": [ {
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+        "code": "LR",
+        "display": "Local Registry ID"
+      } ],
+      "text": "Login del sistema de myhospital"
+    },
+    "system": "bpm",
+    "value": "medico"
+  }],
+      "telecom": [ 
+	  {
+        "system": "phone",
+        "value": "7038207000",
+        "use": "home"
+      }, {
+        "system": "fax",
+        "value": "7039310059",
+        "use": "home"
+      }, {
+        "system": "phone",
+        "value": "7038207000",
+        "use": "work"
+      }, {
+        "system": "fax",
+        "value": "7039310059",
+        "use": "work"
+      } ],
+      "gender": "male",
+      "address": [ {
+        "use": "home",
+        "line": [ "3450 N BEAUREGARD ST", "STE 1" ],
+        "city": "ALEXANDRIA",
+        "state": "VA",
+        "postalCode": "223021200"
+      }, {
+        "use": "work",
+        "line": [ "3450 N BEAUREGARD ST", "STE 1" ],
+        "city": "ALEXANDRIA",
+        "state": "VA",
+        "postalCode": "223021200"
+      } ],
+    "search": {
+      "mode": "match"
+    }
+  }

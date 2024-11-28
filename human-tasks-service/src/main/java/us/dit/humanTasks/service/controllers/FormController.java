@@ -50,13 +50,16 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import us.dit.humanTasks.service.model.FhirTasksDAO;
+import us.dit.humanTasks.service.model.FhirQuestionnaireDAO;
 import us.dit.humanTasks.service.model.TasksDAO;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Isabel Román
+ * @version 19/12/2024
+ * Se eliminan los múltiples return donde se ha identificado
+ * 
  */
 
 @Controller
@@ -71,6 +74,8 @@ public class FormController {
 	
 	@Autowired
 	TasksDAO tasksDao;
+	@Autowired
+	FhirQuestionnaireDAO questDAO;
 	
 	/**
 	 * Main method which controls the submit action
@@ -89,13 +94,15 @@ public class FormController {
     		@RequestParam("taskId") Long taskId,
     		@RequestParam("taskURI") String taskURI,
     		RedirectAttributes redirectAttributes) {
+    	logger.debug("Processando /submit del cuestionario inicial con questionnaireId"+ questionnaireUrl);
         try {
 	    	//Obtengo el Questionnaire para poder buscar los items asociados a las respuestas a partir del linkId de cada item
-	    	Questionnaire questionnaire = getQuestionnaire(questionnaireUrl);
+	    //	Questionnaire questionnaire = getQuestionnaire(questionnaireUrl);
+        	Questionnaire questionnaire = questDAO.getQuestionnaire(questionnaireUrl);
 	    	if (questionnaire == null) {
 	    		redirectAttributes.addFlashAttribute("message", "task.complete.error");
 	            redirectAttributes.addFlashAttribute("alertClass", "error");
-	            return new RedirectView("/tasks");
+	          //  return new RedirectView("/tasks");
 	    	}
 	    	//Construyo el QuestionnaireResponse para guardar las respuestas del formulario
 	    	QuestionnaireResponse questionnaireResponse = buildQuestionnaireResponse(questionnaire, responseByInputName);
@@ -107,14 +114,15 @@ public class FormController {
 	        //printQuestionnaireResponseItems(questionnaireResponse);
 
         	completeTasks(taskURI, questionnaireResponse, taskId);
+        	redirectAttributes.addFlashAttribute("message", "task.complete.success");
+            redirectAttributes.addFlashAttribute("alertClass", "success");
         } catch(Exception e) {
         	redirectAttributes.addFlashAttribute("message", "task.complete.error");
             redirectAttributes.addFlashAttribute("alertClass", "error");
             e.printStackTrace();
-            return new RedirectView("/tasks");
+           // return new RedirectView("/tasks");
         }
-    	redirectAttributes.addFlashAttribute("message", "task.complete.success");
-        redirectAttributes.addFlashAttribute("alertClass", "success");
+    	
 
         return new RedirectView("/tasks");
     }
@@ -127,7 +135,7 @@ public class FormController {
      * @throws Exception
      */
     private void completeTasks(String taskURI, QuestionnaireResponse questionnaireResponse, Long taskId) throws Exception {
-    	fhirDao.completeTask(serverBase, taskURI, questionnaireResponse);
+    	fhirDao.completeTask(taskURI, questionnaireResponse);
     	tasksDao.completeTask(taskId);
     }
     
@@ -366,7 +374,7 @@ public class FormController {
      * Find the Questionnaire resource from its URL.
      * @param questionnaireUrl
      * @return
-     */
+  
     private Questionnaire getQuestionnaire(String questionnaireUrl) {
         // Encuentra la posición del primer "/" después de "Questionnaire/"
 		// Ya que los URLs obtenidos de hapiFhir son así: https://hapi.fhir.org/baseR5/Questionnaire/677937/_history/1;
@@ -376,7 +384,7 @@ public class FormController {
         String questionnaireId = questionnaireUrl.substring(startIndex, endIndex);
         
     	FhirContext ctx = FhirContext.forR5();
-    	String serverBase = "http://hapi.fhir.org/baseR5/";
+    	//String serverBase = "http://hapi.fhir.org/baseR5/";
 		IGenericClient client = ctx.newRestfulGenericClient(serverBase);
 		try {
 	    	Questionnaire myQuestionnaire =
@@ -387,6 +395,7 @@ public class FormController {
             return null;
         }
     }
+       */
     
 //  private void printQuestionnaireResponseItems(QuestionnaireResponse questionnaireResponse) {
 //  for (QuestionnaireResponse.QuestionnaireResponseItemComponent item : questionnaireResponse.getItem()) {

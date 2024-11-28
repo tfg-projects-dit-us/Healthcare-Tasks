@@ -1,0 +1,20 @@
+---
+
+services:
+  hapifhir:
+    image: hapiproject/hapi:latest
+    container_name: hapifhir
+    ports:
+      - 8888:8888
+    volumes:
+      - ./application.yaml:/app/config/application.yaml
+    restart: unless-stopped
+  jbpmserver:
+    image: jboss/jbpm-server-full:latest
+    container_name: jbpmserver
+    ports:
+      - 8080:8080
+      - 8001:8001
+    restart: unless-stopped
+
+

@@ -19,6 +19,10 @@ package us.dit.humanTasks.service.services.kie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jbpm.services.api.DeploymentService;
+import org.jbpm.services.api.model.DeployedUnit;
+import org.kie.api.runtime.manager.RuntimeManager;
+
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -28,11 +32,17 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.client.admin.UserTaskAdminServicesClient;
-import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
+import java.util.ArrayList;
+import us.dit.humanTasks.service.services.kie.KieUtilService;
 
 
 /**
@@ -52,6 +62,8 @@ public class KieUtil implements KieUtilService {
 	@Value("${org.kie.server.pwd}")
 	private String PASSWORD;
 	private static final Logger logger = LogManager.getLogger();
+	@Autowired
+	private DeploymentService deploymentService;
 	
 	
 
@@ -104,6 +116,22 @@ public class KieUtil implements KieUtilService {
 		return client;
 	}
 
+	
+	
+	@Override
+	public void sendSignal(String type, Object event) {
+		/**
+		 * lista de todos los RuntimeManagers disponibles
+		 */
+		Collection<RuntimeManager> managers = new ArrayList<>();
+		Collection<DeployedUnit> deployed = deploymentService.getDeployedUnits();
+
+		for(DeployedUnit unit:deployed) {
+			managers.add(unit.getRuntimeManager());
+			unit.getRuntimeManager().signalEvent(type,event);
+		}
+	}
+	@EventListener(ApplicationReadyEvent.class)
 	private KieServicesClient getKieServicesClient() {
 		logger.info("entro en getkieservicesclient con url " + URL);
 		config = KieServicesFactory.newRestConfiguration(URL, USERNAME, PASSWORD);

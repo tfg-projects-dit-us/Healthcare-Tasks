@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import us.dit.humanTasks.service.model.QuestionnaireDAO;
+import us.dit.humanTasks.service.model.FhirQuestionnaireDAO;
 
 /**
  * @author Marco Antonio Maldonado Orozco
@@ -42,10 +42,10 @@ public class QuestionnaireController {
 	private String serverBase;
 	
 	@Autowired
-	QuestionnaireDAO questionnaireDAO;
+	FhirQuestionnaireDAO questionnaireDAO;
 	
 	/**
-	 * Obtaine the questionnaire from FHIR Task id and return the Questionnaire page.
+	 * Get the questionnaire from FHIR Task id and return the Questionnaire page.
 	 * @param taskId
 	 * @param taskURI
 	 * @param model
@@ -53,9 +53,9 @@ public class QuestionnaireController {
 	 */
 	@GetMapping() 
 	public String getQuestionnaire(@RequestParam("taskId") String taskId, @RequestParam("taskURI") String taskURI, Model model) {
-		logger.info("Entro en getQuestionnaire del controlador Http");	
+		logger.info("Entro en getQuestionnaire del controlador Http para la taskURI "+taskURI);	
 		
-		Questionnaire questionnaire = questionnaireDAO.getQuestionnaireFromTask(taskURI, serverBase);
+		Questionnaire questionnaire = questionnaireDAO.getQuestionnaireFromTask(taskURI);
 		if (questionnaire != null) {
 			
 			//Id de la tarea de businessCentral para saber qué tarea jbpm hay que completar cuando se envíe el cuestionario

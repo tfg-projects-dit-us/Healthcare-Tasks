@@ -1,0 +1,14 @@
+{ 
+  "$coment": "Paciente para los demostradores, habrá N"
+  "resourceType": "Patient",
+  "identifier": [ {
+    "system": "http://acme.org/MRNs",
+    "value": "7000135"
+  } ],
+  "name": [ {
+    "family": "Simpson",
+    "given": [ "Homer", "J" ]
+  } ],
+  "gender": "male"
+}
+

@@ -1,0 +1,2 @@
+Estos recursos se usarán para los test
+Están creados en el servidor local

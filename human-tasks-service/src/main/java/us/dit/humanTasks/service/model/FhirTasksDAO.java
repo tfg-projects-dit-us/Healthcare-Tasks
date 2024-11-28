@@ -17,6 +17,9 @@
 **/
 package us.dit.humanTasks.service.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +33,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
+import ca.uhn.fhir.util.UrlUtil;
 
 import org.hl7.fhir.r5.model.Task;
 import org.hl7.fhir.r5.model.Task.TaskOutputComponent;
@@ -37,6 +41,9 @@ import org.hl7.fhir.r5.model.Task.TaskOutputComponent;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Isabel Román Martínez
+ * @version 19/12/2024
+ * Se ha añadido método para obtener el servidor bas ea partir de la tarea
  */
 @Service
 public class FhirTasksDAO {
@@ -51,6 +58,7 @@ public class FhirTasksDAO {
 	 * @return String
 	 */
 	public String updateTaskStatus(String serverBase, String taskId, Task.TaskStatus taskStatus) {
+		
 		String responseId = null;
 		try {
 			FhirContext ctx = FhirContext.forR5();
@@ -60,6 +68,7 @@ public class FhirTasksDAO {
 	        task.setStatus(taskStatus);
 
 	        MethodOutcome outcome = client.update().resource(task).execute();
+	        logger.debug("Cambiando estado de la tarea "+taskId+" en el servidor FHIR a "+taskStatus);
 	        responseId = outcome.getId().getValueAsString();
 			} catch (FhirClientConnectionException e) {
 	            e.printStackTrace();
@@ -76,15 +85,16 @@ public class FhirTasksDAO {
 	 * @return String
 	 * @throws Exception
 	 */
-	public String completeTask(String serverBase, String taskId, QuestionnaireResponse questionnaireResponse) throws Exception {
+	public String completeTask(String url, QuestionnaireResponse questionnaireResponse) throws Exception {
+		String serverBase = getServerBase(url);
 		String questionnaireResponseId = saveQuestionnaireResponse(serverBase, questionnaireResponse);
 		String responseId = null;
-		logger.info("Se va a finalizar la tarea " + taskId + " con el cuestionario de respuesta " + questionnaireResponseId);
+	
+		logger.info("Se va a finalizar la tarea " + url + " con el cuestionario de respuesta " + questionnaireResponseId);
 		
 		FhirContext ctx = FhirContext.forR5();
-		IGenericClient client = ctx.newRestfulGenericClient(serverBase);
-		
-		Task task = client.read().resource(Task.class).withId(taskId).execute();
+		IGenericClient client = ctx.newRestfulGenericClient(getServerBase(url));
+		Task task = getTask(url);
         task.setStatus(Task.TaskStatus.COMPLETED);
         
         TaskOutputComponent outputComponent = new TaskOutputComponent();
@@ -103,6 +113,51 @@ public class FhirTasksDAO {
         responseId = outcome.getId().getValueAsString();
 	
 		return responseId;
+	}
+	/**
+	 * Busca el servidor base de la url de la tarea que se pasa, si no es la url de un Task devuelve null
+	 * @param url de la tarea
+	 * @return servidor base o null si la url no es de una Task
+	 */
+	public String getServerBase(String url) {
+		
+		String serverBase=null;
+		logger.debug("Pregunto el servidor base del cuestionario con url ",url);		
+		int pos=url.indexOf("Task");
+		if (pos!=-1) {
+			serverBase=url.substring(0,pos);
+			logger.debug("Localizado servidor base "+ serverBase);
+		}
+		return serverBase;		
+	}
+	/**
+	 * Busca una tarea a partir de su url completa
+	 * @param url completa de la tarea
+	 * @return la tarea localizada
+	 */
+	public Task getTask(String url) {
+		
+		// We're connecting to a DSTU1 compliant server in this example
+				FhirContext ctx = FhirContext.forR5();
+				//Necesito sacar del url por un lado el servidor y por otro el id
+				String serverBase;
+				Task task=null;
+				try {
+					logger.debug("Busco task " + url);		
+					serverBase=getServerBase(url);					
+					String taskId=UrlUtil.parseUrl(url).getResourceId();	
+					logger.debug("serverBase: "+serverBase);
+					logger.debug("task id "+taskId);
+					IGenericClient client = ctx.newRestfulGenericClient(serverBase);			
+					task =
+					      client.read().resource(Task.class).withId(taskId).execute();
+					logger.info("Localizada task " + task.getId());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					logger.debug("Error al recuperar la tarea del servidor");
+					e.printStackTrace();
+				}
+				return task;		
 	}
 	
 	/**
