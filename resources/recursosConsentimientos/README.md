@@ -1,4 +1,4 @@
-* Escenario de pruebas adicional
+# Escenario de pruebas adicional
 
 En este directorio se proporcionan recursos adicionales para la verificación del proyecto utilizando los procesos de gestión de consentimientos disponibles en el repositorio [ConsentFlow-Hub](https://github.com/tfg-projects-dit-us/ConsentFlow-Hub), en lugar de los del kjar adjunto a Healthcare-Tasks
 
@@ -6,7 +6,7 @@ Para realizar las pruebas y continuar con el desarrollo, utilizando este kjar, s
 
 En http://localhost:8090/h2-console/ puede consultar la base de datos h2 (en memoria) durante la ejecución (mantener login y password por defecto, sa, sa)
 
-* Descripción de los recursos
+# Descripción de los recursos
 
 metaQuestionnaireConsent
 Recurso de tipo Questionnaire. MetaCuestionario para la generación de la solicitud de consentimiento. 
