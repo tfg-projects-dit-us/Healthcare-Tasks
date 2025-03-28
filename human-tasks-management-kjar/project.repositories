@@ -3,9 +3,9 @@
     <repository>
       <include>true</include>
       <metadata>
-        <id>github</id>
-        <url>https://maven.pkg.github.com/mit-fs/audit4improve-api</url>
-        <source>SETTINGS</source>
+        <id>reposilite-kie</id>
+        <url>http://reposilite:8081/kie</url>
+        <source>DISTRIBUTION_MANAGEMENT</source>
       </metadata>
     </repository>
     <repository>
@@ -20,7 +20,7 @@
       <include>true</include>
       <metadata>
         <id>local</id>
-        <url>D:/codigo/mvnLocal</url>
+        <url>/opt/jboss/.m2/repository</url>
         <source>LOCAL</source>
       </metadata>
     </repository>

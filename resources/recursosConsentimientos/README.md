@@ -1,3 +1,13 @@
+# Escenario de pruebas adicional
+
+En este directorio se proporcionan recursos adicionales para la verificación del proyecto utilizando los procesos de gestión de consentimientos disponibles en el repositorio [ConsentFlow-Hub](https://github.com/tfg-projects-dit-us/ConsentFlow-Hub), en lugar de los del kjar adjunto a Healthcare-Tasks
+
+Para realizar las pruebas y continuar con el desarrollo, utilizando este kjar, se necesitan una serie de recursos en FHIR, disponibles en la carpeta resources. Puede crearlos uno a uno en una única transacción usando el Bundle disponible en el fichero Bundle4Transaction.json. Puede acceder a localhost:8888 y ejecutar una transacción copiando este Bundle (creará todos los recursos a la vez)
+
+En http://localhost:8090/h2-console/ puede consultar la base de datos h2 (en memoria) durante la ejecución (mantener login y password por defecto, sa, sa)
+
+# Descripción de los recursos
+
 metaQuestionnaireConsent
 Recurso de tipo Questionnaire. MetaCuestionario para la generación de la solicitud de consentimiento. 
 El id de este Questionnaire tendrá que ir referenciado como el cuestionario de cierre de la tarea de solicitud del consentimiento 
