@@ -64,9 +64,7 @@ Para ejecutar en modo development deberá usar ``launch-dev.bat clean install`` 
 
 En ``http://localhost:8090/h2-console/`` puede consultar la base de datos h2 (en memoria) durante la ejecución (mantener login y password por defecto, sa, sa)
 
-Para realizar las pruebas y continuar con el desarrollo podría necesitar una serie de recursos en FHIR, disponibles en la carpeta [resources](./resources). Puede crearlos uno a uno en una única transacción usando el ``Bundle`` disponible en el fichero ``Bundle4Transaction.json``. 
-Puede acceder a localhost:8888 y ejecutar una transacción copiando este Bundle (creará todos los recursos a la vez)
+Para realizar las pruebas y continuar con el desarrollo podría necesitar una serie de recursos en FHIR, disponibles en la carpeta [resources](../resources/recursosConsentimientos). En este directorio puede encontrar información adicional como soporte a la verificación.
 
-Si desea iniciar una instancia del proceso ConsentRequest puede realizar un GET con su navegador a: ``localhost:8090/test/sendConsentRequest`` Esto viola completamente los principios REST y nunca debe ser utilizado en producción, sólo se realiza para facilitar la verificación y depuración
 
 
