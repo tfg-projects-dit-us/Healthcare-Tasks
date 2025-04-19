@@ -1,6 +1,6 @@
 @echo off
-
-set "JAVA_HOME=D:\Programas\Java\jdk-11.0.8"
+set "JAVA_HOME=C:\Program Files\Java\jdk-11"
+rem set "JAVA_HOME=D:\Programas\Java\jdk-11.0.8"
 rem set "JAVA_HOME=C:\Program Files\Java\jdk-11.0.4"
 set mavenInput="%*"
 
@@ -41,7 +41,7 @@ goto :startapp
     for /f "delims=" %%x in ('dir /od /b *.jar') do set latestjar=%%x
     cd ..
 rem call java -Dspring.profiles.active=dev -jar target\%latestjar%
-    call java -Dspring.profiles.active=dev --illegal-access=permit --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED -jar target\%latestjar%
+    call java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dspring.profiles.active=dev --illegal-access=permit --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED -jar target\%latestjar%
 
 
 :end

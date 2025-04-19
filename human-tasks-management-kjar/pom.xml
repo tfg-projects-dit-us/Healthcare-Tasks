@@ -48,11 +48,11 @@
   </dependencies>
   <distributionManagement>
 	<repository>
-		<id>reposilite-kie</id>
-		<url>http://reposilite:8081/kie</url>
-		<layout>default</layout>
-	</repository>
-</distributionManagement>
+      <id>reposilite-kie</id>
+      <url>http://reposilite:8081/kie</url>
+      <layout>default</layout>
+    </repository>
+  </distributionManagement>
   <build>
     <plugins>
       <plugin>

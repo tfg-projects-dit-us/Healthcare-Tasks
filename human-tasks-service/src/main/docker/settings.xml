@@ -5,3 +5,30 @@
 
   <offline>true</offline>
 </settings>
+<activeProfiles>
+	<activeProfile>reposilite-profile</activeProfile>
+</activeProfiles>
+<profiles>
+	<profile>
+		<id>reposilite-profile</id>
+		<repositories>
+			<repository>
+				<id>reposilite</id>
+				<url>http://localhost:8081/kie</url>
+				<releases>
+					<enabled>true</enabled>
+				</releases>
+				<snapshots>
+					<enabled>true</enabled>
+				</snapshots>
+			</repository>
+		</repositories>
+	</profile>		
+</profiles>
+<server>
+	<id>reposilite</id>
+	<username>jbpm</username>
+	<password>Qkjbf2gGjBIIufQJD79K0Js7KLlINal2l4AmchNJ74HUP67NRBfmgaL+c7hpET+q</password>
+</server>
+</servers>
+</settings>
