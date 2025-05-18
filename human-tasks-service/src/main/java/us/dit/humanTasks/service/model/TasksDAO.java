@@ -20,6 +20,8 @@ package us.dit.humanTasks.service.model;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Date;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -59,22 +61,22 @@ public class TasksDAO {
 	@Autowired
 	private KieUtilService kie;
 	
-//	@Autowired
-//	private RuntimeDataService rtDS;
+	//	@Autowired
+	//	private RuntimeDataService rtDS;
 	@Autowired
 	private UserTaskService uTS;
 
 	/**
-	 * Find all jBPM tasks assigned and potential for user
+	 * Find all jBPM tasks completed, assigned and potential for user
 	 * @param user
 	 * @return List<TaskSummary>
 	 */
 	public List<TaskSummary> findAllTasks(String user) {
+		List<String> statusList = Arrays.asList("Reserved", "Completed", "InProgress", "Ready");
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		logger.info("Invocando findAllTasks con usuario: "+ user);
-		return client.findTasksAssignedAsPotentialOwner(user, 0, Integer.MAX_VALUE);
+		return client.findTasksAssignedAsPotentialOwner(user, statusList ,0, Integer.MAX_VALUE);
     }
-	
 	/**
 	 * Find all jBPM assigned tasks for user
 	 * @param user
@@ -83,7 +85,10 @@ public class TasksDAO {
 	public List<TaskSummary> findAssignedTasks(String user) {
 		logger.info("Invocando findAssignedTasks con usuario: "+ user);
 		List<TaskSummary> allTasks = findAllTasks(user);
-		return allTasks.stream().filter(task -> task.getActualOwner() != null).collect(Collectors.toList());
+	    return allTasks.stream()
+			.filter(task -> !"Completed".equals(task.getStatus()))
+			.filter(task -> user.equals(task.getActualOwner()))
+			.collect(Collectors.toList());
     }
 	
 	/**
@@ -95,6 +100,20 @@ public class TasksDAO {
 		logger.info("Invocando findPotentialTasks con usuario: "+ user);
 		List<TaskSummary> allTasks = findAllTasks(user);
 		return allTasks.stream().filter(task -> task.getActualOwner() == null).collect(Collectors.toList());
+    }
+
+	/**
+	 * Find all jBPM completed tasks for user
+	 * @param user
+	 * @return List<TaskSummary>
+	 */
+	public List<TaskSummary> findCompletedTasks(String user) {
+		logger.info("Invocando findCompletedTasks con usuario: "+ user);
+		List<TaskSummary> allTasks = findAllTasks(user);
+		return allTasks.stream()
+		    .filter(task -> "Completed".equals(task.getStatus()))
+        	.filter(task -> user.equals(task.getActualOwner()))
+        	.collect(Collectors.toList());
     }
 	
 	/**
@@ -166,14 +185,19 @@ public class TasksDAO {
 	 * @param taskId
 	 * @throws Exception
 	 */
-	public void completeTask(Long taskId) throws Exception {
+	public void completeTask(Long taskId, String questionnaireResponseId) throws Exception {
 		UserTaskServicesClient client = kie.getUserTaskServicesClient();
 		TaskInstance taskInstance = client.findTaskById(taskId);
 		String containerId = taskInstance.getContainerId();
 		String user = taskInstance.getActualOwner();
 		logger.info("Completar la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
-
-		client.completeTask(containerId, taskId, user, new HashMap<>());
+		//We store as a process variable the questionnaireResponseId generated when we complete the task
+		Map<String,Object> variables= new HashMap<String,Object>();
+	    variables.put("questionnaireResponseURI", questionnaireResponseId);
+		//Expiration Date is now a Completion Date
+		Date completionDate = new Date();
+		client.setTaskExpirationDate(containerId, taskId, completionDate);
+		client.completeTask(containerId, taskId, user, variables);
 	}
 	
 	/**

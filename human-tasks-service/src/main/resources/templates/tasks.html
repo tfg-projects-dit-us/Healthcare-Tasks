@@ -29,8 +29,9 @@
         <h1 th:text="#{tasks.title}"></h1>
         <div id="alertBox" th:if="${message}" th:class="${'floating-alert-' + alertClass}" th:text="#{${message}}"></div>
         <div class="button-container">
-            <button onclick="window.location.href='/tasks/assignedTasks'" th:text="#{tasks.assignedTasks}"></button>
             <button onclick="window.location.href='/tasks/potentialTasks'" th:text="#{tasks.potentialTasks}"></button>
+            <button onclick="window.location.href='/tasks/assignedTasks'" th:text="#{tasks.assignedTasks}"></button>
+            <button onclick="window.location.href='/tasks/completedTasks'" th:text="#{tasks.completedTasks}"></button>
         </div>
     </div>
     <script>

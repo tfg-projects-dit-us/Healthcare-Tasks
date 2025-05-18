@@ -51,5 +51,42 @@
       </config-item>
     </configItems>
   </configuration>
-  <containers/>
+  <containers>
+    <container>
+      <containerId>human-tasks-management_1.0.0-SNAPSHOT</containerId>
+      <releaseId>
+        <groupId>us.dit</groupId>
+        <artifactId>human-tasks-management</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+      </releaseId>
+      <status>STARTED</status>
+      <scanner>
+        <status>STOPPED</status>
+      </scanner>
+      <configItems>
+        <config-item>
+          <name>KBase</name>
+          <value></value>
+          <type>BPM</type>
+        </config-item>
+        <config-item>
+          <name>KSession</name>
+          <value></value>
+          <type>BPM</type>
+        </config-item>
+        <config-item>
+          <name>MergeMode</name>
+          <value>MERGE_COLLECTIONS</value>
+          <type>BPM</type>
+        </config-item>
+        <config-item>
+          <name>RuntimeStrategy</name>
+          <value>SINGLETON</value>
+          <type>BPM</type>
+        </config-item>
+      </configItems>
+      <messages/>
+      <containerAlias>human-tasks-management</containerAlias>
+    </container>
+  </containers>
 </kie-server-state>

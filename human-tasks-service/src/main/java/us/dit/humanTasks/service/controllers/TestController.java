@@ -17,6 +17,7 @@
 **/
 package us.dit.humanTasks.service.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -61,6 +62,15 @@ public class TestController {
 	
 	@Autowired
 	private KieUtilService kie;
+
+	@Value("${test.roleprocessLow}")
+	private String rolPL;
+
+	@Value("${test.roleprocessMedium}")
+	private String rolPM;
+
+	@Value("${test.roleprocessHigh}")
+	private String rolPH;
 	
 	/**
 	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al usuario que lo invoca
@@ -89,8 +99,21 @@ public class TestController {
 		test.newTareaARol();
 		return new RedirectView("/tasks");
 	}
-	
 
+	/**
+	 * Método para test, permite iniciar los procesos a rol de muestra con distintas prioridades, que asigna la tarea al rol webadmin
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
+	@GetMapping("/initTareasARolMuestra")
+	public RedirectView TestARolMuestras() {	
+		logger.info("entro en /initTareasARolMuestra");
+		test.newTareaARolWithExpirationTimer(rolPH,0,0,5);
+		test.newTareaARolWithExpirationTimer(rolPM,2,12,0);
+		test.newTareaARolWithExpirationTimer(rolPL,14,0,0);
+		return new RedirectView("/tasks");
+	}
 
 	/**
 	 * Método para test, permite enviar la señal ConsentRequest al motor kie, adjuntando el 

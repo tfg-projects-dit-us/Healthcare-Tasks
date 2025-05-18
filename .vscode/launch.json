@@ -10,19 +10,6 @@
             "request": "attach",
             "hostName": "localhost",
             "port": 5005
-        }, 
-        {
-            "type": "java",
-            "name": "Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Application",
-            "request": "launch",
-            "mainClass": "us.dit.humanTasks.service.Application",
-            "projectName": "human-tasks-service"
         }
     ]
 }

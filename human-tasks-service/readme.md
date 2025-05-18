@@ -60,11 +60,17 @@ En el fichero settings.xml de maven debe configurar el acceso al reposilite, el 
 ``
 
 ### Verificación
-Para ejecutar en modo development deberá usar ``launch-dev.bat clean install`` En este caso el fichero de configuración utilizado es ``application-dev.properties``
+Para ejecutar en modo development deberá usar ``launch-dev.bat clean install`` En este caso el fichero de configuración utilizado es ``application-dev.properties``. Es recomendable mirar que su variable de entorno JAVA_HOME se encuentre bien configurada conforme a la de su dispositivo en ``launch-dev.bat``, y que los contenedores Docker estén funcionando.
 
-En ``http://localhost:8090/h2-console/`` puede consultar la base de datos h2 (en memoria) durante la ejecución (mantener login y password por defecto, sa, sa)
+Al ejecutar el modo developer, este abrirá el puerto 5005 para escuchar. Será necesario conectarse a este puerto para ejecutar el modo debug. Se proporciona el archivo ``launch.json`` para ejecutar en modo debug (IDE VisualStudioCode).
+
+Una vez tenga el modo developer corriendo en su máquina será necesario crear un contenedor kie en Business Central dentro del servidor Docker. Para ello puede importar su proyecto desde el repositorio GitHub ``https://github.com/tfg-projects-dit-us/Healthcare-Tasks/``y posteriormente debe implementarlo en el servidor pulsando el botón implementar.
+
+En ``http://localhost:8090/h2-console/`` puede consultar la base de datos h2 (en memoria) durante la ejecución (mantener login y password por defecto, sa, sa).
 
 Para realizar las pruebas y continuar con el desarrollo podría necesitar una serie de recursos en FHIR, disponibles en la carpeta [resources](../resources). En este directorio puede encontrar información adicional como soporte a la verificación.
+
+
 
 
 

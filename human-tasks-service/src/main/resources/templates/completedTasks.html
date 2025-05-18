@@ -21,17 +21,17 @@
 <html>
 <head>
     <meta charset="UTF-8">
-	<title th:text="#{tasks.assignedTasks}"></title>
-	<link rel="stylesheet" th:href="@{/css/tasks-styles.css}">
+	<title th:text="#{tasks.completedTasks}"></title>
+	<link rel="stylesheet"th:href="@{/css/tasks-styles.css}">
 	<!-- Autor: Marco Antonio Maldonado Orozco -->
 </head>
 <body>
-	<script th:src="@{/js/taskActions.js}"></script>
+    <script th:src="@{/js/taskActions.js}"></script>
     <script th:src="@{/js/filterAction.js}"></script>
     <script th:src="@{/js/orderAction.js}"></script>
-	<div class="header">
+    <div class="header">
         <button class="back-button" onclick="window.location.href='/tasks'" th:text="#{back}"></button>
-    	<h1 th:text="#{tasks.assignedTasks}"></h1>
+    	<h1 th:text="#{tasks.completedTasks}"></h1>
     </div>
     <div class="filter-container">
         <label for="filterColumn" th:text="#{tasks.filterBy}"></label>
@@ -39,20 +39,19 @@
             <option value="" th:text="#{tasks.none}" selected></option>
             <option value="name" th:text="#{tasks.name}"></option>
             <option value="createdOn" th:text="#{tasks.creationDate}"></option>
-            <option value="expirationTime" th:text="#{tasks.expirationTime}"></option>
+            <option value="expirationTime" th:text="#{tasks.completionTime}"></option>
             <option value="priority" th:text="#{tasks.priority}"></option>
             <option value="subject" th:text="#{tasks.subject}"></option>
-            <option value="status" th:text="#{tasks.status}"></option>
         </select>
         <input type="text" id="textFilterInput" onkeyup="filterTable()" placeholder="Type to filter..." style="display:none">
         <select id="prioritySelect" onchange="filterTable()" style="display:none">
-            <option value="" th:text="#{task.priority.All}" selected></option>
+            <option value="" th:text="#{task.priority.All}"></option>
             <option th:value="#{task.priority.High}" th:text="#{task.priority.High}"></option>
             <option th:value="#{task.priority.Medium}" th:text="#{task.priority.Medium}"></option>
             <option th:value="#{task.priority.Low}" th:text="#{task.priority.Low}"></option>
         </select>
         <select id="statusSelect" onchange="filterTable()" style="display:none">
-            <option value="" th:text="#{task.status.All}" selected></option>
+            <option th:value="#{task.status.All}" th:text="#{task.status.All}"></option>
             <option th:value="#{task.status.Reserved}" th:text="#{task.status.Reserved}"></option>
             <option th:value="#{task.status.InProgress}" th:text="#{task.status.InProgress}"></option>
         </select>
@@ -80,7 +79,7 @@
                     <span class="sort-indicator"></span>
                 </th>
                 <th class="sortable" data-column="expirationTime" onclick="sortByColumn('expirationTime')">
-                    <span th:text="#{tasks.expirationTime}"></span>
+                    <span th:text="#{tasks.completionTime}"></span>
                     <span class="sort-indicator"></span>
                 </th>
                 <th class="sortable" data-column="priority" onclick="sortByColumn('priority')">
@@ -89,10 +88,6 @@
                 </th>
                 <th class="sortable" data-column="subject" onclick="sortByColumn('subject')">
                     <span th:text="#{tasks.subject}"></span>
-                    <span class="sort-indicator"></span>
-                </th>
-                <th class="sortable" data-column="status" onclick="sortByColumn('status')">
-                    <span th:text="#{tasks.status}"></span>
                     <span class="sort-indicator"></span>
                 </th>
                 <th th:text="#{tasks.actions}"></th>
@@ -107,29 +102,13 @@
                 <td data-column="priority" th:if="${task.priority <= 3}" th:text="#{task.priority.High}" style="color: red;"></td>
                 <td data-column="priority" th:if="${task.priority >= 4 and task.priority <= 6}" th:text="#{task.priority.Medium}" style="color: orange;"></td>
                 <td data-column="priority" th:if="${task.priority >= 7}" th:text="#{task.priority.Low}" style="color: green;"></td>
-                <td data-column="subject" th:text="${task.subject}"></td>  
-                <td data-column="status" th:text="#{'task.status.' + ${task.status}}"></td>
+                <td data-column="subject" th:text="${task.subject}"></td>                
                 <td class="actions">
-                    <form method="post" action="/tasks/start">
+                    <form method="post" action="/tasks/view">
                         <input type="hidden" name="taskId" th:value="${task.id}">
-                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
                         <input type="hidden" name="containerId" th:value="${task.containerId}">
                         <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
-                        <button type="submit" th:text="#{tasks.start}" th:disabled="${task.status != 'Reserved'}"></button>
-                    </form>
-                    <form method="post" action="/tasks/continue">
-                        <input type="hidden" name="taskId" th:value="${task.id}">
-                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
-                        <input type="hidden" name="containerId" th:value="${task.containerId}">
-                        <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
-                        <button type="submit" th:text="#{tasks.continue}" th:disabled="${task.status != 'InProgress'}"></button>
-                    </form>
-                    <form method="post" action="/tasks/reject">
-                        <input type="hidden" name="taskId" th:value="${task.id}">
-                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
-                        <input type="hidden" name="containerId" th:value="${task.containerId}">
-                        <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
-                        <button type="submit" th:text="#{tasks.reject}"></button>
+                        <button type="submit" th:text="#{tasks.view}"></button>
                     </form>
                 </td>
             </tr>
@@ -137,3 +116,5 @@
     </table>
 </body>
 </html>
+
+

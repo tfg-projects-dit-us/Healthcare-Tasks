@@ -135,8 +135,8 @@ public class FormController {
      * @throws Exception
      */
     private void completeTasks(String taskURI, QuestionnaireResponse questionnaireResponse, Long taskId) throws Exception {
-    	fhirDao.completeTask(taskURI, questionnaireResponse);
-    	tasksDao.completeTask(taskId);
+    	String questionnaireResponseId = fhirDao.completeTask(taskURI, questionnaireResponse);
+    	tasksDao.completeTask(taskId, questionnaireResponseId);
     }
     
     /**

@@ -113,6 +113,21 @@ public class TasksController {
 		model.addAttribute("tasks", tasks);
 		return "potentialTasks";
 	}
+
+	/**
+	 * Shows the completedTasks page
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
+	@GetMapping("/completedTasks")
+	public String getCompletedTasks(HttpSession session, Model model) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails principal = (UserDetails) auth.getPrincipal();
+		List<TaskSummary> tasks = taskDao.findCompletedTasks(principal.getUsername());
+		model.addAttribute("tasks", tasks);
+		return "completedTasks";
+	}
 	
 	/**
 	 * Manage the claim action from potentialTasks page
@@ -122,6 +137,7 @@ public class TasksController {
 	 * @param model
 	 * @return RedirectView
 	 */
+	
 	@PostMapping("/claim")
     public RedirectView claimTask(@RequestParam("taskId") Long taskId, @RequestParam("containerId") String containerId, 
     		@RequestParam("processInstanceId") Long processInstanceId, Model model) {

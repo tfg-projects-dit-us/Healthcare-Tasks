@@ -112,7 +112,7 @@ public class FhirTasksDAO {
         MethodOutcome outcome = client.update().resource(task).execute();
         responseId = outcome.getId().getValueAsString();
 	
-		return responseId;
+		return questionnaireResponseId;
 	}
 	/**
 	 * Busca el servidor base de la url de la tarea que se pasa, si no es la url de un Task devuelve null

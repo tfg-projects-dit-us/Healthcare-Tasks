@@ -24,17 +24,19 @@ package us.dit.humanTasks.service.services.kie;
 
 import java.util.HashMap;
 import java.util.Map;
-
-
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.kie.server.client.ProcessServicesClient;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+
 
 
 
@@ -61,6 +63,7 @@ public class TestService {
 
 	@Value("${test.userprocess}")		
 	private String userP;
+	
 	/**
 	 * Instancia un proceso con una tarea humana asignada al rol kie-server
 	 * @return el id del proceso instanciado
@@ -71,6 +74,25 @@ public class TestService {
 	    variables.put("taskURI", taskId);	  
 		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, rolP,variables);
+		logger.info("Instanciado proceso " + idInstanceProcess.toString());
+		return idInstanceProcess;
+	}
+
+	public Long newTareaARolWithExpirationTimer(String roleprocess, int days,int hours, int minutes) {
+		// Obtain the current date and time in UTC
+        ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
+				.plusDays(days)
+                .plusHours(hours)
+                .plusMinutes(minutes);
+        // Format the updated date and time in ISO 8601 format without milliseconds
+        String expirationDateTimeISO8601 = expirationDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX"));
+		Map<String,Object> variables= new HashMap<>();
+        logger.info("Entro en newTareaARolWithParameters");
+	    variables.put("taskURI", taskId);
+		variables.put("p_DueDate", expirationDateTimeISO8601);
+		variables.put("p_Subject", "Medicaciones");
+		ProcessServicesClient client = kie.getProcessServicesClient();
+		Long idInstanceProcess = client.startProcess(containerId, roleprocess ,variables);
 		logger.info("Instanciado proceso " + idInstanceProcess.toString());
 		return idInstanceProcess;
 	}
