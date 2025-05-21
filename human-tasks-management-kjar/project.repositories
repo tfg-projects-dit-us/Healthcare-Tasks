@@ -3,14 +3,6 @@
     <repository>
       <include>true</include>
       <metadata>
-        <id>reposilite-kie</id>
-        <url>http://reposilite:8081/kie</url>
-        <source>DISTRIBUTION_MANAGEMENT</source>
-      </metadata>
-    </repository>
-    <repository>
-      <include>true</include>
-      <metadata>
         <id>central</id>
         <url>https://repo.maven.apache.org/maven2</url>
         <source>PROJECT</source>
@@ -22,6 +14,14 @@
         <id>local</id>
         <url>/opt/jboss/.m2/repository</url>
         <source>LOCAL</source>
+      </metadata>
+    </repository>
+    <repository>
+      <include>true</include>
+      <metadata>
+        <id>reposilite-kie</id>
+        <url>http://reposilite:8081/kie</url>
+        <source>DISTRIBUTION_MANAGEMENT</source>
       </metadata>
     </repository>
   </repositories>
