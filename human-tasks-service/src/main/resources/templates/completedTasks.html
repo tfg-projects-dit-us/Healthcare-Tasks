@@ -106,6 +106,7 @@
                 <td class="actions">
                     <form method="post" action="/tasks/view">
                         <input type="hidden" name="taskId" th:value="${task.id}">
+                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
                         <input type="hidden" name="containerId" th:value="${task.containerId}">
                         <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
                         <button type="submit" th:text="#{tasks.view}"></button>

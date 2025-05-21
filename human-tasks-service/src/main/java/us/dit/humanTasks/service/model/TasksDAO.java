@@ -56,6 +56,8 @@ public class TasksDAO {
 	private static final Logger logger = LogManager.getLogger();
 	
 	private static final String TASK_URI = "taskURI";
+
+	private static final String QUESTIONNAIRE_RESPONSE_URI = "questionnaireResponseURI";
 	
 	//Se intentará eliminar kie y usar sólo rtDS
 	@Autowired
@@ -198,6 +200,23 @@ public class TasksDAO {
 		Date completionDate = new Date();
 		client.setTaskExpirationDate(containerId, taskId, completionDate);
 		client.completeTask(containerId, taskId, user, variables);
+	}
+
+	/**
+	 * Return the FHIR Task id associated to the jBPM Task
+	 * @param taskId
+	 * @param user
+	 * @param containerId
+	 * @param processInstanceId
+	 * @return
+	 */
+	public String viewTask(Long taskId, String user, String containerId, Long processInstanceId) {
+	
+		logger.info("Ver la tarea con id " + taskId + " del contenedor con id " + containerId);
+		String taskURI=uTS.getTaskInputContentByTaskId(taskId).get(TASK_URI).toString();
+		String questionnaireResponseURI=uTS.getTaskOutputContentByTaskId(taskId).get(QUESTIONNAIRE_RESPONSE_URI).toString();
+        logger.info("La tarea con id " + taskId +" y URI"+ taskURI + " está relacionada con el cuestionario respuesta fhir con id " + questionnaireResponseURI);
+        return questionnaireResponseURI;
 	}
 	
 	/**

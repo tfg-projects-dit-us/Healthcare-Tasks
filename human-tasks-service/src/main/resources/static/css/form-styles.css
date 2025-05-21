@@ -77,8 +77,18 @@ body {
 				
 .title-container {
  	display: flex;
- 	justify-content: center;
+	justify-content: center;
+    flex-wrap: wrap;
 }	
+
+.title-container {
+    display: flex;
+    width: min-content;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+}
 	
 .title-container .title {
 	border-bottom: 2px solid black;
@@ -129,4 +139,11 @@ body {
 .error-label {
 	font-weight: 600;
 	color: darkred;
+}
+
+.answer {
+  width: 100%;
+  overflow: overlay;
+  padding-top: 3px;
+	font-size: 15px;
 }

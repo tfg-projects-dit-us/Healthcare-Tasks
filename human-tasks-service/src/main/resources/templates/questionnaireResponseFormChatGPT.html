@@ -1,0 +1,61 @@
+<!--
+
+*  This file is part of Healthcare Tasks: Human task management in healthcare contexts.
+*  Copyright (C) 2024  Universidad de Sevilla/Departamento de Ingeniería Telemática
+*
+*  Healthcare Tasks is free software: you can redistribute it and/or
+*  modify it under the terms of the GNU General Public License as published
+*  by the Free Software Foundation, either version 3 of the License, or (at
+*  your option) any later version.
+*
+*  Healthcare Tasks is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+*  Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License along
+*  with Healthcare Tasks. If not, see <https://www.gnu.org/licenses/>.
+
+-->
+<!DOCTYPE html>
+<!-- Ayuda con edicion html https://www.w3schools.com/howto/default.asp -->
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${questionnaireResponseURI}"></title>
+	<link rel="stylesheet" href="/css/form-styles.css">
+	<!-- Autor: Marco Antonio Maldonado Orozco -->
+</head>
+<body>
+    <h1>Respuestas del Cuestionario</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pregunta</th>
+                <th>Respuesta(s)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${questionnaireResponse.item}">
+                <td th:text="${item.text}">Texto de la pregunta</td>
+                <td>
+                    <ul>
+                        <li th:each="answer : ${item.answer}">
+                            <span th:if="${answer.valueString != null}" th:text="${answer.valueString}"></span>
+                            <span th:if="${answer.valueCoding != null}" th:text="${answer.valueCoding.display}"></span>
+                            <span th:if="${answer.valueUri != null}" th:text="${answer.valueUri}"></span>
+                            <span th:if="${answer.valueQuantity != null}" 
+                                  th:text="${answer.valueQuantity.value + ' ' + answer.valueQuantity.unit}"></span>
+                            <span th:if="${answer.valueInteger != null}" th:text="${answer.valueInteger}"></span>
+                            <span th:if="${answer.valueDecimal != null}" th:text="${answer.valueDecimal}"></span>
+                            <span th:if="${answer.valueReference != null}" th:text="${answer.valueReference.reference}"></span>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

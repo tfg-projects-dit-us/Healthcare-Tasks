@@ -83,7 +83,7 @@ public class TestController {
 		logger.info("entro en /initTareaAUsuario");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		test.newTareaAUsuario(principal.getUsername());
+		test.newTareaAUsuario(principal.getUsername(),"Tratamientos",0,0,5);
 		return new RedirectView("/tasks");
 	}
 	
@@ -109,9 +109,9 @@ public class TestController {
 	@GetMapping("/initTareasARolMuestra")
 	public RedirectView TestARolMuestras() {	
 		logger.info("entro en /initTareasARolMuestra");
-		test.newTareaARolWithExpirationTimer(rolPH,0,0,5);
-		test.newTareaARolWithExpirationTimer(rolPM,2,12,0);
-		test.newTareaARolWithExpirationTimer(rolPL,14,0,0);
+		test.newTareaARolWithExpirationTimer(rolPH,"Tratamientos",0,0,5);
+		test.newTareaARolWithExpirationTimer(rolPM,"Citas",2,12,0);
+		test.newTareaARolWithExpirationTimer(rolPL,"Tratamientos",14,0,0);
 		return new RedirectView("/tasks");
 	}
 

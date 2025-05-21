@@ -78,7 +78,7 @@ public class TestService {
 		return idInstanceProcess;
 	}
 
-	public Long newTareaARolWithExpirationTimer(String roleprocess, int days,int hours, int minutes) {
+	public Long newTareaARolWithExpirationTimer(String roleprocess,String subject, int days,int hours, int minutes) {
 		// Obtain the current date and time in UTC
         ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
 				.plusDays(days)
@@ -90,7 +90,7 @@ public class TestService {
         logger.info("Entro en newTareaARolWithParameters");
 	    variables.put("taskURI", taskId);
 		variables.put("p_DueDate", expirationDateTimeISO8601);
-		variables.put("p_Subject", "Medicaciones");
+		variables.put("p_Subject", subject);
 		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, roleprocess ,variables);
 		logger.info("Instanciado proceso " + idInstanceProcess.toString());
@@ -101,11 +101,20 @@ public class TestService {
 	 * @param principal usuario al que se le asigna la tarea
 	 * @return el id del proceso instanciado
 	 */
-	public Long newTareaAUsuario(String principal) {
+	public Long newTareaAUsuario(String principal,String subject, int days,int hours, int minutes) {
+		// Obtain the current date and time in UTC
+        ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
+				.plusDays(days)
+                .plusHours(hours)
+                .plusMinutes(minutes);
+        // Format the updated date and time in ISO 8601 format without milliseconds
+        String expirationDateTimeISO8601 = expirationDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX"));
 		Map<String,Object> variables= new HashMap<String,Object>();
         logger.info("Entro en newTareaAUsuario");
 	    variables.put("taskURI", taskId);
 	    variables.put("user", principal);
+		variables.put("p_DueDate", expirationDateTimeISO8601);
+		variables.put("p_Subject", subject);
 		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, userP,variables);
 		logger.info("Instanciado proceso " + idInstanceProcess.toString());

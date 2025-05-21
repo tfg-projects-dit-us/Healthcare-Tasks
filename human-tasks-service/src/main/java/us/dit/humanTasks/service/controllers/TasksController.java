@@ -58,6 +58,8 @@ public class TasksController {
 	
 	private static final String TASK_ID = "taskId";
 
+	private static final String QUESTIONNAIRE_RESPONSE_URI = "questionnaireResponseURI";
+
 		
 	@Value("${fhir.server.base}")
 	private String serverBase;
@@ -207,6 +209,34 @@ public class TasksController {
         String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId);
         fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.READY);
         return new RedirectView("/tasks/assignedTasks");
+    }
+
+	/**
+	 * Manage the view action from CompletedTasks page
+	 * @param taskId
+	 * @param actualOwner
+	 * @param containerId
+	 * @param processInstanceId
+	 * @param redirectAttributes
+	 * @return RedirectView
+	 */
+	@PostMapping("/view")
+    public RedirectView viewTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
+    		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {
+		String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId);
+        String questionnaireResponseURI = taskDao.viewTask(taskId, actualOwner, containerId, processInstanceId);
+        redirectAttributes.addAttribute(TASK_ID, taskId);
+		redirectAttributes.addAttribute(TASK_URI, taskURI);
+		redirectAttributes.addAttribute(QUESTIONNAIRE_RESPONSE_URI, questionnaireResponseURI);
+        return new RedirectView("/questionnaireResponse");
+    }
+
+	@GetMapping("/view2")
+    public RedirectView viewTask2(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addAttribute(TASK_ID, 1);
+		redirectAttributes.addAttribute(TASK_URI, "TaskTest");
+		redirectAttributes.addAttribute(QUESTIONNAIRE_RESPONSE_URI, "http://localhost:8888/fhir/QuestionnaireResponse/6/_history/1");
+        return new RedirectView("/questionnaireResponse");
     }
 	
 	//Este método se ha usado para la verificación de la seguridad, se comenta pero se deja por si fuera necesario en otro momento
