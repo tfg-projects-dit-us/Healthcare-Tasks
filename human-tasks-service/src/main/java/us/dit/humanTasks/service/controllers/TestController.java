@@ -17,15 +17,11 @@
 **/
 package us.dit.humanTasks.service.controllers;
 
-import java.util.Date;
-import java.util.List;
-
 import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hl7.fhir.r5.model.Task;
-import org.kie.server.api.model.instance.TaskSummary;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -46,6 +42,7 @@ import us.dit.humanTasks.service.services.kie.TestService;
 import us.dit.humanTasks.service.services.kie.KieUtilService;
 
 /**
+ * @author Juan Manuel Ostos Rabadán
  * @author Isabel Román Martínez
  */
 @Controller
@@ -96,7 +93,7 @@ public class TestController {
 	@GetMapping("/initTareaARol")
 	public RedirectView TestARol() {	
 		logger.info("entro en /initTareaARol");
-		test.newTareaARol();
+		test.newTareaARol(rolPM,"Citas",2,12,0);
 		return new RedirectView("/tasks");
 	}
 
@@ -109,9 +106,9 @@ public class TestController {
 	@GetMapping("/initTareasARolMuestra")
 	public RedirectView TestARolMuestras() {	
 		logger.info("entro en /initTareasARolMuestra");
-		test.newTareaARolWithExpirationTimer(rolPH,"Tratamientos",0,0,5);
-		test.newTareaARolWithExpirationTimer(rolPM,"Citas",2,12,0);
-		test.newTareaARolWithExpirationTimer(rolPL,"Tratamientos",14,0,0);
+		test.newTareaARol(rolPH,"Tratamientos",0,0,5);
+		test.newTareaARol(rolPM,"Citas",2,12,0);
+		test.newTareaARol(rolPL,"Tratamientos",14,0,0);
 		return new RedirectView("/tasks");
 	}
 

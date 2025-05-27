@@ -1,3 +1,7 @@
+/*
+  Autor: Juan Manuel Ostos Rabadán
+*/
+//esta función filtra las filas de las tablas dejando solo las que cumplan con el filtro especificado 
 function filterTable() {
     const column = document.getElementById('filterColumn').value;
     const filterInput = document.getElementById('textFilterInput').value.toLowerCase();
@@ -32,8 +36,8 @@ function filterTable() {
         row.style.display = showRow ? '' : 'none';
     });
 }
-
-function toggleDateInputs() {
+//esta función muestra u oculta los inputs específicos de cada columna según la columna por la que se desee filtrar.
+function toggleFilterInputs() {
     //reseteamos valores de inputs
     document.getElementById('textFilterInput').value='';
     document.getElementById('prioritySelect').value='';

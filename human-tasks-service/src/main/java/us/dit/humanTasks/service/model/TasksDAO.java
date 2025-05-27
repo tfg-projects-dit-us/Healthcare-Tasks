@@ -45,6 +45,7 @@ import us.dit.humanTasks.service.services.kie.KieUtilService;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Juan Manuel Ostos Rabadán
  * @author Isabel Román
  * @version 19/12/2024
  * Hacia el cambio para no usar kieutilservice, por ahora se usa UserTaskService donde es posible

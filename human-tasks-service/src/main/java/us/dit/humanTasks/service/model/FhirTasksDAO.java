@@ -41,6 +41,7 @@ import org.hl7.fhir.r5.model.Task.TaskOutputComponent;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Juan Manuel Ostos Rabadán
  * @author Isabel Román Martínez
  * @version 19/12/2024
  * Se ha añadido método para obtener el servidor bas ea partir de la tarea

@@ -25,7 +25,7 @@
 	<meta charset="UTF-8">
 	<title th:text="#{navbar.questionnaireResponse}"></title>
 	<link rel="stylesheet" href="/css/form-styles.css">
-	<!-- Autor: Marco Antonio Maldonado Orozco -->
+     <!-- Autor: Juan Manuel Ostos Rabadán -->
 </head>
 <body>
 	<div th:insert="~{navbar.html}"/>
@@ -35,9 +35,7 @@
 
     <div class="question-container" th:each="item : ${FormattedItems}">
         <div class="question-title" th:text="${item.key}"></div>
-        <div class="answer-container" th:each="answers : ${item.value}">
-            <div class="answer" th:each="answer : ${answers}" th:text="${answer}"></div>
-        </div>
+        <div class="answer" th:each="answer : ${item.value}" th:text="${answer}"></div>
     </div>
 </body>
 </html>

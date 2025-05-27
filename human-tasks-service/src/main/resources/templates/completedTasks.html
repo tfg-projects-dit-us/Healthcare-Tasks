@@ -23,7 +23,7 @@
     <meta charset="UTF-8">
 	<title th:text="#{tasks.completedTasks}"></title>
 	<link rel="stylesheet"th:href="@{/css/tasks-styles.css}">
-	<!-- Autor: Marco Antonio Maldonado Orozco -->
+     <!-- Autor: Juan Manuel Ostos Rabadán -->
 </head>
 <body>
     <script th:src="@{/js/taskActions.js}"></script>
@@ -35,7 +35,7 @@
     </div>
     <div class="filter-container">
         <label for="filterColumn" th:text="#{tasks.filterBy}"></label>
-        <select id="filterColumn" onchange="toggleDateInputs()">
+        <select id="filterColumn" onchange="toggleFilterInputs()">
             <option value="" th:text="#{tasks.none}" selected></option>
             <option value="name" th:text="#{tasks.name}"></option>
             <option value="createdOn" th:text="#{tasks.creationDate}"></option>

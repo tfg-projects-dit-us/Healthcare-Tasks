@@ -48,6 +48,7 @@ import us.dit.humanTasks.service.services.kie.TestService;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Juan Manuel Ostos Rabadán
  */
 @Controller
 @RequestMapping("/tasks")
@@ -223,18 +224,13 @@ public class TasksController {
 	@PostMapping("/view")
     public RedirectView viewTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
     		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {
-		String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId);
         String questionnaireResponseURI = taskDao.viewTask(taskId, actualOwner, containerId, processInstanceId);
-        redirectAttributes.addAttribute(TASK_ID, taskId);
-		redirectAttributes.addAttribute(TASK_URI, taskURI);
 		redirectAttributes.addAttribute(QUESTIONNAIRE_RESPONSE_URI, questionnaireResponseURI);
         return new RedirectView("/questionnaireResponse");
     }
 
 	@GetMapping("/view2")
     public RedirectView viewTask2(RedirectAttributes redirectAttributes) {
-        redirectAttributes.addAttribute(TASK_ID, 1);
-		redirectAttributes.addAttribute(TASK_URI, "TaskTest");
 		redirectAttributes.addAttribute(QUESTIONNAIRE_RESPONSE_URI, "http://localhost:8888/fhir/QuestionnaireResponse/6/_history/1");
         return new RedirectView("/questionnaireResponse");
     }

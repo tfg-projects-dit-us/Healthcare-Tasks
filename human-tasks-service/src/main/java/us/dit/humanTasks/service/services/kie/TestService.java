@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * ESTE SERVICIO ES PARA TESTS, PERMITE INSTANCIAR PROCESOS CON TAREAS HUMANAS
+ * @author Juan Manuel Ostos Rabadán
  * @Author Isabel Román
  */
 @Service
@@ -68,17 +69,7 @@ public class TestService {
 	 * Instancia un proceso con una tarea humana asignada al rol kie-server
 	 * @return el id del proceso instanciado
 	 */
-	public Long newTareaARol() {
-		Map<String,Object> variables= new HashMap<String,Object>();
-        logger.info("Entro en newTareaARol");
-	    variables.put("taskURI", taskId);	  
-		ProcessServicesClient client = kie.getProcessServicesClient();
-		Long idInstanceProcess = client.startProcess(containerId, rolP,variables);
-		logger.info("Instanciado proceso " + idInstanceProcess.toString());
-		return idInstanceProcess;
-	}
-
-	public Long newTareaARolWithExpirationTimer(String roleprocess,String subject, int days,int hours, int minutes) {
+	public Long newTareaARol(String roleprocess,String subject, int days,int hours, int minutes) {
 		// Obtain the current date and time in UTC
         ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
 				.plusDays(days)
@@ -87,7 +78,7 @@ public class TestService {
         // Format the updated date and time in ISO 8601 format without milliseconds
         String expirationDateTimeISO8601 = expirationDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX"));
 		Map<String,Object> variables= new HashMap<>();
-        logger.info("Entro en newTareaARolWithParameters");
+        logger.info("Entro en newTareaARol");
 	    variables.put("taskURI", taskId);
 		variables.put("p_DueDate", expirationDateTimeISO8601);
 		variables.put("p_Subject", subject);

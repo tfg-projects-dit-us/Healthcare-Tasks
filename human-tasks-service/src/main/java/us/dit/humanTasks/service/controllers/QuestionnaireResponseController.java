@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.maven.project.artifact.AttachedArtifact;
+
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,14 +32,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.ctc.wstx.shaded.msv_core.datatype.xsd.StringType;
-import java.lang.ref.Reference;
-import java.math.BigDecimal;
 
-import us.dit.humanTasks.service.model.FhirQuestionnaireDAO;
+import us.dit.humanTasks.service.model.FhirQuestionnaireResponseDAO;
 
 /**
- * @author Marco Antonio Maldonado Orozco
+ * @author Juan Manuel Ostos Rabadán
  */
 @Controller
 @RequestMapping("/questionnaireResponse")
@@ -50,23 +47,22 @@ public class QuestionnaireResponseController {
 	private String serverBase;
 	
 	@Autowired
-	FhirQuestionnaireDAO questionnaireDAO;
+	FhirQuestionnaireResponseDAO questionnaireResponseDAO;
 	
 	/**
-	 * Get the questionnaire from FHIR Task id and return the Questionnaire page.
-	 * @param taskId
-	 * @param taskURI
+	 * Get the questionnaire from FHIR QuestionnaireRespone id and return the QuestionnaireResponse page.
+
 	 * @param model
 	 * @return String
 	 */
 	@GetMapping() 
-	public String getQuestionnaireResponse(@RequestParam("taskId") String taskId, @RequestParam("taskURI") String taskURI, @RequestParam("questionnaireResponseURI") String questionnaireResponseURI, Model model) {
-		logger.info("Entro en getQuestionnaireResponse del controlador Http para la taskURI "+taskURI);	
+	public String getQuestionnaireResponse(@RequestParam("questionnaireResponseURI") String questionnaireResponseURI, Model model) {
+		logger.info("Entro en getQuestionnaireResponse del controlador Http para la questionnaireResponseURI "+questionnaireResponseURI);	
 		
-		QuestionnaireResponse questionnaireResponse = questionnaireDAO.getQuestionnaireResponse(questionnaireResponseURI);
+		QuestionnaireResponse questionnaireResponse = questionnaireResponseDAO.getQuestionnaireResponse(questionnaireResponseURI);
 
 		if (questionnaireResponse != null) {
-			HashMap<String, List<List<String>>> FormattedItems = questionnaireDAO.getQuestionnaireResponseItems(questionnaireResponse);
+			HashMap<String,List<String>> FormattedItems = questionnaireResponseDAO.getQuestionnaireResponseItems(questionnaireResponse);
 
 			model.addAttribute("questionnaireResponseURI", questionnaireResponseURI);
 			model.addAttribute("FormattedItems", FormattedItems);

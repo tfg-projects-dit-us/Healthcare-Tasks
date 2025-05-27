@@ -56,6 +56,7 @@ import us.dit.humanTasks.service.model.TasksDAO;
 
 /**
  * @author Marco Antonio Maldonado Orozco
+ * @author Juan Manuel Ostos Rabadán
  * @author Isabel Román
  * @version 19/12/2024
  * Se eliminan los múltiples return donde se ha identificado
