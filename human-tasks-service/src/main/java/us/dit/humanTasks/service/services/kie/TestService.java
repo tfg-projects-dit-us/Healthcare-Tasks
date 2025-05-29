@@ -50,8 +50,8 @@ public class TestService {
 
 	private static final Logger logger = LogManager.getLogger();
 	
-	@Autowired
-	private KieUtilService kie;
+	//@Autowired
+	//private KieUtilService kie;
 
 	@Value("${test.taskid}")
 	private String taskId;
@@ -69,7 +69,7 @@ public class TestService {
 	 * Instancia un proceso con una tarea humana asignada al rol kie-server
 	 * @return el id del proceso instanciado
 	 */
-	public Long newTareaARol(String roleprocess,String subject, int days,int hours, int minutes) {
+	public Long newTareaARol(ProcessServicesClient client, String roleprocess,String subject, int days,int hours, int minutes) {
 		// Obtain the current date and time in UTC
         ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
 				.plusDays(days)
@@ -82,7 +82,6 @@ public class TestService {
 	    variables.put("taskURI", taskId);
 		variables.put("p_DueDate", expirationDateTimeISO8601);
 		variables.put("p_Subject", subject);
-		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, roleprocess ,variables);
 		logger.info("Instanciado proceso " + idInstanceProcess.toString());
 		return idInstanceProcess;
@@ -92,7 +91,7 @@ public class TestService {
 	 * @param principal usuario al que se le asigna la tarea
 	 * @return el id del proceso instanciado
 	 */
-	public Long newTareaAUsuario(String principal,String subject, int days,int hours, int minutes) {
+	public Long newTareaAUsuario(ProcessServicesClient client, String principal,String subject, int days,int hours, int minutes) {
 		// Obtain the current date and time in UTC
         ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
 				.plusDays(days)
@@ -106,7 +105,6 @@ public class TestService {
 	    variables.put("user", principal);
 		variables.put("p_DueDate", expirationDateTimeISO8601);
 		variables.put("p_Subject", subject);
-		ProcessServicesClient client = kie.getProcessServicesClient();
 		Long idInstanceProcess = client.startProcess(containerId, userP,variables);
 		logger.info("Instanciado proceso " + idInstanceProcess.toString());
 		return idInstanceProcess;

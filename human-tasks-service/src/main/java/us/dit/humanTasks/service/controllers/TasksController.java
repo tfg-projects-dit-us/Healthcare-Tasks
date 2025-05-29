@@ -229,11 +229,11 @@ public class TasksController {
         return new RedirectView("/questionnaireResponse");
     }
 
-	@GetMapping("/view2")
+	/*@GetMapping("/view2")
     public RedirectView viewTask2(RedirectAttributes redirectAttributes) {
 		redirectAttributes.addAttribute(QUESTIONNAIRE_RESPONSE_URI, "http://localhost:8888/fhir/QuestionnaireResponse/6/_history/1");
         return new RedirectView("/questionnaireResponse");
-    }
+    }*/
 	
 	//Este método se ha usado para la verificación de la seguridad, se comenta pero se deja por si fuera necesario en otro momento
 	//Lo que hace es devolver un listado de los roles asignados a un usuario

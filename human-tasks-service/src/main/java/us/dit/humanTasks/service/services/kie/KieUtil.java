@@ -55,11 +55,11 @@ import us.dit.humanTasks.service.services.kie.KieUtilService;
 
 @Service
 public class KieUtil implements KieUtilService {
-	@Value("${kieserver.location}")
+	@Value("${kieserver[0].location}")
 	private String URL;
-	@Value("${org.kie.server.user}")
+	@Value("${kieserver[0].user}")
 	private String USERNAME;
-	@Value("${org.kie.server.pwd}")
+	@Value("${kieserver[0].pwd}")
 	private String PASSWORD;
 	private static final Logger logger = LogManager.getLogger();
 	@Autowired

@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.kie.server.client.ProcessServicesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -39,7 +39,10 @@ import org.springframework.web.servlet.view.RedirectView;
 import us.dit.humanTasks.service.model.FhirTasksDAO;
 import us.dit.humanTasks.service.model.TasksDAO;
 import us.dit.humanTasks.service.services.kie.TestService;
-import us.dit.humanTasks.service.services.kie.KieUtilService;
+import us.dit.humanTasks.service.services.kie.KieServerFactoryService;
+//import us.dit.humanTasks.service.services.kie.KieUtilService;
+
+import java.util.List;
 
 /**
  * @author Juan Manuel Ostos Rabadán
@@ -57,8 +60,11 @@ public class TestController {
 	@Autowired
 	private TestService test;
 	
+	//@Autowired
+	//private KieUtilService kie;
+
 	@Autowired
-	private KieUtilService kie;
+	private KieServerFactoryService kieSFS;
 
 	@Value("${test.roleprocessLow}")
 	private String rolPL;
@@ -78,9 +84,11 @@ public class TestController {
 	@GetMapping("/initTareaAUsuario")
 	public RedirectView TestAUsu() {
 		logger.info("entro en /initTareaAUsuario");
+		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
+		ProcessServicesClient client = processClientList.get(0);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		test.newTareaAUsuario(principal.getUsername(),"Tratamientos",0,0,5);
+		test.newTareaAUsuario(client, principal.getUsername(),"Tratamientos",0,0,5);
 		return new RedirectView("/tasks");
 	}
 	
@@ -93,7 +101,24 @@ public class TestController {
 	@GetMapping("/initTareaARol")
 	public RedirectView TestARol() {	
 		logger.info("entro en /initTareaARol");
-		test.newTareaARol(rolPM,"Citas",2,12,0);
+		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
+		ProcessServicesClient client = processClientList.get(0);
+		test.newTareaARol(client, rolPM,"Citas",2,12,0);
+		return new RedirectView("/tasks");
+	}
+
+	/**
+	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al rol webadmin
+	 * @param session
+	 * @param model
+	 * @return String
+	 */
+	@GetMapping("/initTareaARol2")
+	public RedirectView TestARol2() {	
+		logger.info("entro en /initTareaARol");
+		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
+		ProcessServicesClient client = processClientList.get(1);
+		test.newTareaARol(client, rolPM,"Citas",2,12,0);
 		return new RedirectView("/tasks");
 	}
 
@@ -106,16 +131,19 @@ public class TestController {
 	@GetMapping("/initTareasARolMuestra")
 	public RedirectView TestARolMuestras() {	
 		logger.info("entro en /initTareasARolMuestra");
-		test.newTareaARol(rolPH,"Tratamientos",0,0,5);
-		test.newTareaARol(rolPM,"Citas",2,12,0);
-		test.newTareaARol(rolPL,"Tratamientos",14,0,0);
+		//kieSFS.init();
+		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
+		ProcessServicesClient client = processClientList.get(1);
+		test.newTareaARol(client, rolPH,"Tratamientos",0,0,5);
+		test.newTareaARol(client, rolPM,"Citas",2,12,0);
+		test.newTareaARol(client, rolPL,"Tratamientos",14,0,0);
 		return new RedirectView("/tasks");
 	}
 
 	/**
 	 * Método para test, permite enviar la señal ConsentRequest al motor kie, adjuntando el 
 	 */
-	@GetMapping("/sendConsentRequest")
+	/*@GetMapping("/sendConsentRequest")
 	public RedirectView sendSignal() {
 	
 		// Se envía la señal al motor KIE
@@ -124,5 +152,5 @@ public class TestController {
 		kie.sendSignal("ConsentRequest", "http://localhost:8888/fhir/Task/5");
 
 		return new RedirectView("/tasks");
-	}
+	}*/
 }

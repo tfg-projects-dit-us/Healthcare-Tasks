@@ -3,17 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.dit</groupId>
-  <artifactId>copia</artifactId>
+  <artifactId>human-tasks-management</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>kjar</packaging>
-  <name>copia</name>
+  <name>human-tasks-management</name>
   <description></description>
-  <distributionManagement>
-    <repository>
-      <id>reposilite-kie</id>
-      <url>http://reposilite:8081/kie</url>
-    </repository>
-  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
@@ -52,6 +46,13 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <distributionManagement>
+	<repository>
+		<id>reposilite-kie</id>
+		<url>http://reposilite:8081/kie</url>
+		<layout>default</layout>
+	</repository>
+</distributionManagement>
   <build>
     <plugins>
       <plugin>
