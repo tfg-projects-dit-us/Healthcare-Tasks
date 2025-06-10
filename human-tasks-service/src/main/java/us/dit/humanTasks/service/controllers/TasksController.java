@@ -20,6 +20,7 @@ package us.dit.humanTasks.service.controllers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -27,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Task;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.UserTaskServicesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -58,6 +60,8 @@ public class TasksController {
 	private static final String TASK_URI = "taskURI";
 	
 	private static final String TASK_ID = "taskId";
+
+	private static final String SERVER_INDEX = "serverIndex";
 
 	private static final String QUESTIONNAIRE_RESPONSE_URI = "questionnaireResponseURI";
 
@@ -97,8 +101,8 @@ public class TasksController {
 	public String getAssignedTasks(HttpSession session, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		List<TaskSummary> tasks = taskDao.findAssignedTasks(principal.getUsername());
-		model.addAttribute("tasks", tasks);
+		Map<Integer, List<TaskSummary>> taskMap = taskDao.findAssignedTasks(principal.getUsername());
+		model.addAttribute("taskMap", taskMap);
 		return "assignedTasks";
 	}
 	
@@ -112,8 +116,8 @@ public class TasksController {
 	public String getPotentialTasks(HttpSession session, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		List<TaskSummary> tasks = taskDao.findPotentialTasks(principal.getUsername());
-		model.addAttribute("tasks", tasks);
+		Map<Integer, List<TaskSummary>> taskMap = taskDao.findPotentialTasks(principal.getUsername());
+		model.addAttribute("taskMap", taskMap);
 		return "potentialTasks";
 	}
 
@@ -127,8 +131,8 @@ public class TasksController {
 	public String getCompletedTasks(HttpSession session, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		List<TaskSummary> tasks = taskDao.findCompletedTasks(principal.getUsername());
-		model.addAttribute("tasks", tasks);
+		Map<Integer, List<TaskSummary>> taskMap = taskDao.findCompletedTasks(principal.getUsername());
+		model.addAttribute("taskMap", taskMap);
 		return "completedTasks";
 	}
 	
@@ -143,13 +147,13 @@ public class TasksController {
 	
 	@PostMapping("/claim")
     public RedirectView claimTask(@RequestParam("taskId") Long taskId, @RequestParam("containerId") String containerId, 
-    		@RequestParam("processInstanceId") Long processInstanceId, Model model) {
+    		@RequestParam("processInstanceId") Long processInstanceId, @RequestParam("serverIndex") Integer serverIndex, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
 		String user = principal.getUsername();
-		taskDao.claimTask(taskId, user, containerId);
+		taskDao.claimTask(taskId, user, containerId, serverIndex);
 		
-		String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId);
+		String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId, serverIndex);
 		fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.REQUESTED);
         return new RedirectView("/tasks/potentialTasks");
     }
@@ -165,13 +169,14 @@ public class TasksController {
 	 */
 	@PostMapping("/start")
     public RedirectView startTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId,
-    		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {     
+    		@RequestParam("processInstanceId") Long processInstanceId, @RequestParam("serverIndex") Integer serverIndex, RedirectAttributes redirectAttributes) {     
 		
-		String taskURI = taskDao.startTask(taskId, actualOwner, containerId, processInstanceId);
+		String taskURI = taskDao.startTask(taskId, actualOwner, containerId, processInstanceId, serverIndex);
 		fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.INPROGRESS);
 		logger.debug("Metiendo en el contexto TASK_URI "+ taskURI+" y TASK_ID "+ taskId);
 		redirectAttributes.addAttribute(TASK_ID, taskId);
         redirectAttributes.addAttribute(TASK_URI, taskURI);
+		redirectAttributes.addAttribute(SERVER_INDEX, serverIndex);
         return new RedirectView("/questionnaire");
     }
 	
@@ -186,9 +191,9 @@ public class TasksController {
 	 */
 	@PostMapping("/continue")
     public RedirectView continueTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
-    		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {
+    		@RequestParam("processInstanceId") Long processInstanceId, @RequestParam("serverIndex") Integer serverIndex, RedirectAttributes redirectAttributes) {
 
-        String taskURI = taskDao.continueTask(taskId, actualOwner, containerId, processInstanceId);
+        String taskURI = taskDao.continueTask(taskId, actualOwner, containerId, processInstanceId, serverIndex);
         redirectAttributes.addAttribute(TASK_ID, taskId);
         redirectAttributes.addAttribute(TASK_URI, taskURI);
         return new RedirectView("/questionnaire");
@@ -205,9 +210,9 @@ public class TasksController {
 	 */
 	@PostMapping("/reject")
     public RedirectView rejectTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
-    		@RequestParam("processInstanceId") Long processInstanceId, Model model) {
-        taskDao.rejectTask(taskId, actualOwner, containerId);
-        String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId);
+    		@RequestParam("processInstanceId") Long processInstanceId, @RequestParam("serverIndex") Integer serverIndex, Model model) {
+        taskDao.rejectTask(taskId, actualOwner, containerId, serverIndex);
+        String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId, serverIndex);
         fhirDao.updateTaskStatus(serverBase, taskURI, Task.TaskStatus.READY);
         return new RedirectView("/tasks/assignedTasks");
     }
@@ -223,8 +228,9 @@ public class TasksController {
 	 */
 	@PostMapping("/view")
     public RedirectView viewTask(@RequestParam("taskId") Long taskId, @RequestParam("actualOwner") String actualOwner, @RequestParam("containerId") String containerId, 
-    		@RequestParam("processInstanceId") Long processInstanceId, RedirectAttributes redirectAttributes) {
-        String questionnaireResponseURI = taskDao.viewTask(taskId, actualOwner, containerId, processInstanceId);
+    		@RequestParam("processInstanceId") Long processInstanceId, @RequestParam("serverIndex") Integer serverIndex, RedirectAttributes redirectAttributes) {
+        String taskURI = taskDao.getTaskURIFromTaskInputContent(taskId, containerId, processInstanceId, serverIndex);
+		String questionnaireResponseURI = fhirDao.getQuestionnaireResponseId(taskURI);
 		redirectAttributes.addAttribute(QUESTIONNAIRE_RESPONSE_URI, questionnaireResponseURI);
         return new RedirectView("/questionnaireResponse");
     }

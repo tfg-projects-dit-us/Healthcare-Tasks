@@ -94,25 +94,28 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="task : ${tasks}">
-				<td data-column="processId" th:text="${task.processId}"></td>
-                <td data-column="name" th:text="${task.name}"></td>
-                <td data-column="createdOn" th:text="${#dates.format(task.createdOn, 'yyyy/MM/dd HH:mm:ss')}"></td>
-                <td data-column="expirationTime" th:text="${#dates.format(task.expirationTime, 'yyyy/MM/dd HH:mm:ss')}"></td>
-                <td data-column="priority" th:if="${task.priority <= 3}" th:text="#{task.priority.High}" style="color: red;"></td>
-                <td data-column="priority" th:if="${task.priority >= 4 and task.priority <= 6}" th:text="#{task.priority.Medium}" style="color: orange;"></td>
-                <td data-column="priority" th:if="${task.priority >= 7}" th:text="#{task.priority.Low}" style="color: green;"></td>
-                <td data-column="subject" th:text="${task.subject}"></td>                
-                <td class="actions">
-                    <form method="post" action="/tasks/view">
-                        <input type="hidden" name="taskId" th:value="${task.id}">
-                        <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
-                        <input type="hidden" name="containerId" th:value="${task.containerId}">
-                        <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
-                        <button type="submit" th:text="#{tasks.view}"></button>
-                    </form>
-                </td>
-            </tr>
+            <th:block th:each="tasks : ${taskMap}">
+                <tr th:each="task : ${tasks.value}">
+                    <td data-column="processId" th:text="${task.processId}"></td>
+                    <td data-column="name" th:text="${task.name}"></td>
+                    <td data-column="createdOn" th:text="${#dates.format(task.createdOn, 'yyyy/MM/dd HH:mm:ss')}"></td>
+                    <td data-column="expirationTime" th:text="${#dates.format(task.expirationTime, 'yyyy/MM/dd HH:mm:ss')}"></td>
+                    <td data-column="priority" th:if="${task.priority <= 3}" th:text="#{task.priority.High}" style="color: red;"></td>
+                    <td data-column="priority" th:if="${task.priority >= 4 and task.priority <= 6}" th:text="#{task.priority.Medium}" style="color: orange;"></td>
+                    <td data-column="priority" th:if="${task.priority >= 7}" th:text="#{task.priority.Low}" style="color: green;"></td>
+                    <td data-column="subject" th:text="${task.subject}"></td>                
+                    <td class="actions">
+                        <form method="post" action="/tasks/view">
+                            <input type="hidden" name="taskId" th:value="${task.id}">
+                            <input type="hidden" name="actualOwner" th:value="${task.actualOwner}">
+                            <input type="hidden" name="containerId" th:value="${task.containerId}">
+                            <input type="hidden" name="processInstanceId" th:value="${task.processInstanceId}">
+                            <input type="hidden" name="serverIndex" th:value="${tasks.key}">
+                            <button type="submit" th:text="#{tasks.view}"></button>
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
         </tbody>
     </table>
 </body>

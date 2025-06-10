@@ -17,8 +17,6 @@
 **/
 package us.dit.humanTasks.service.controllers;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kie.server.client.ProcessServicesClient;
@@ -28,21 +26,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import us.dit.humanTasks.service.model.FhirTasksDAO;
-import us.dit.humanTasks.service.model.TasksDAO;
 import us.dit.humanTasks.service.services.kie.TestService;
-import us.dit.humanTasks.service.services.kie.KieServerFactoryService;
-//import us.dit.humanTasks.service.services.kie.KieUtilService;
+import us.dit.humanTasks.service.services.kie.KieUtilFactoryService;
 
-import java.util.List;
+//import java.util.List;
 
 /**
  * @author Juan Manuel Ostos Rabadán
@@ -63,9 +55,6 @@ public class TestController {
 	//@Autowired
 	//private KieUtilService kie;
 
-	@Autowired
-	private KieServerFactoryService kieSFS;
-
 	@Value("${test.roleprocessLow}")
 	private String rolPL;
 
@@ -74,6 +63,9 @@ public class TestController {
 
 	@Value("${test.roleprocessHigh}")
 	private String rolPH;
+
+	@Value("${test.roleprocessWithoutTimer}")
+	private String rolPwT;
 	
 	/**
 	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al usuario que lo invoca
@@ -82,43 +74,37 @@ public class TestController {
 	 * @return String
 	 */
 	@GetMapping("/initTareaAUsuario")
-	public RedirectView TestAUsu() {
+	public RedirectView TestAUsu(@RequestParam("serverIndex") Integer serverIndex) {
 		logger.info("entro en /initTareaAUsuario");
-		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
-		ProcessServicesClient client = processClientList.get(0);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails principal = (UserDetails) auth.getPrincipal();
-		test.newTareaAUsuario(client, principal.getUsername(),"Tratamientos",0,0,5);
+		test.newTareaAUsuario(serverIndex, principal.getUsername(),"Tratamientos",0,0,5);
 		return new RedirectView("/tasks");
 	}
 	
 	/**
-	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al rol webadmin
+	 * Método para test, permite iniciar el proceso TareaARol, que asigna la tarea al rol wbadmin
 	 * @param session
 	 * @param model
 	 * @return String
 	 */
 	@GetMapping("/initTareaARol")
-	public RedirectView TestARol() {	
+	public RedirectView TestARol(@RequestParam("serverIndex") Integer serverIndex) {	
 		logger.info("entro en /initTareaARol");
-		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
-		ProcessServicesClient client = processClientList.get(0);
-		test.newTareaARol(client, rolPM,"Citas",2,12,0);
+		test.newTareaARol(serverIndex, rolPL,"Citas",1,0,0);
 		return new RedirectView("/tasks");
 	}
 
 	/**
-	 * Método para test, permite iniciar el proceso TareaAUsuario, que asigna la tarea al rol webadmin
+	 * Método para test, permite iniciar el proceso TareaARol sin timer, que asigna la tarea al rol wbadmin
 	 * @param session
 	 * @param model
 	 * @return String
 	 */
-	@GetMapping("/initTareaARol2")
-	public RedirectView TestARol2() {	
+	@GetMapping("/initTareaARolSinTimer")
+	public RedirectView TestARolSinTimer(@RequestParam("serverIndex") Integer serverIndex) {	
 		logger.info("entro en /initTareaARol");
-		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
-		ProcessServicesClient client = processClientList.get(1);
-		test.newTareaARol(client, rolPM,"Citas",2,12,0);
+		test.newTareaARol(serverIndex, rolPwT,"Citas",0,0,5);
 		return new RedirectView("/tasks");
 	}
 
@@ -129,14 +115,11 @@ public class TestController {
 	 * @return String
 	 */
 	@GetMapping("/initTareasARolMuestra")
-	public RedirectView TestARolMuestras() {	
+	public RedirectView TestARolMuestras(@RequestParam("serverIndex") Integer serverIndex) {	
 		logger.info("entro en /initTareasARolMuestra");
-		//kieSFS.init();
-		List<ProcessServicesClient> processClientList = kieSFS.getProcessClientList();
-		ProcessServicesClient client = processClientList.get(1);
-		test.newTareaARol(client, rolPH,"Tratamientos",0,0,5);
-		test.newTareaARol(client, rolPM,"Citas",2,12,0);
-		test.newTareaARol(client, rolPL,"Tratamientos",14,0,0);
+		test.newTareaARol(serverIndex, rolPH,"Tratamientos",0,0,5);
+		test.newTareaARol(serverIndex, rolPM,"Citas",0,8,0);
+		test.newTareaARol(serverIndex, rolPL,"Tratamientos",1,0,0);
 		return new RedirectView("/tasks");
 	}
 

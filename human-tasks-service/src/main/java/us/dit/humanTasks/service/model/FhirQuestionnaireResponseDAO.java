@@ -110,7 +110,7 @@ public class FhirQuestionnaireResponseDAO {
 					for (QuestionnaireResponseItemAnswerComponent answer : answers) {
 						if(answer.hasValueCoding()){
 							Coding value = answer.getValueCoding();
-							FormattedAnswer.add(value.getDisplay()+": "+value.getCode());
+							FormattedAnswer.add(value.getCode());
 						}
 						if(answer.hasValueDateTimeType()){
 							DateTimeType value= answer.getValueDateTimeType();

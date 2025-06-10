@@ -15,9 +15,10 @@ Pero posteriormente se han hecho los siguientes cambios a la configuración por 
 ## Ejecución
 * Es necesario analizar el fichero xxxx.properties del directorio resources para comprender la configuración de la aplicación Springboot
 * application.postgres se ha editado para incluir como bbdd por defecto postgres (el orginal se ha mantenido con la extensión BU). Previo a la ejecución debe estar creada la BBDD y el usuario en el servidor postgres y después ejecutar. 
-* Se necesita también un servidor FHIR de respaldo, cuya dirección también se configura en este fichero
+* Se necesita también un servidor FHIR de respaldo, cuya dirección también se configura en este fichero.
 * En windows ejecutar .\launch.bat clean install -Ppostgres
-* Se ha añadido una clase para la configuración de las variables del sistema que configuran el servidor kie (o cualquier otra). Es necesario añadir en application.properties la variable con el prefijo system.properties
+* Se ha añadido una clase application.properties para la configuración de las variables del sistema que configuran los servidores kie (o cualquier otra propiedad). Es necesario añadir en application.properties la variable con el prefijo system.properties.
+* La aplicación puede conectarse a varios servidores kie que debe configurar previamente en el fichero anterior. Por defecto se levantará un servidor kie embebido al arrancar la aplicación accesible mediante la url http://localhost:8090/rest/server . Si desea probar con dos servidores simultáneamente, debe poner en marcha otro servidor levantando localmente el servicio de Business Bentral desde el repositorio [EntornoDesarrollojBPM], importar el kjar del proyecto e implementarlo en el servidor kie "sample-server" que proporciona business-central por defecto. Este segundo servidor debería ser accesible desde la url http://localhost:8080/kie-server/services/rest/server .
 
 ## Entorno de desarrollo
 ### Despliegue del entorno
@@ -60,7 +61,7 @@ En el fichero settings.xml de maven debe configurar el acceso al reposilite, el 
 ``
 
 ### Verificación
-Para ejecutar en modo development deberá usar ``launch-dev.bat clean install`` En este caso el fichero de configuración utilizado es ``application-dev.properties``. Es recomendable mirar que su variable de entorno JAVA_HOME se encuentre bien configurada conforme a la de su dispositivo en ``launch-dev.bat``, y que los contenedores Docker estén funcionando.
+Para ejecutar en modo development deberá usar ``launch-dev.bat clean install`` En este caso el fichero de configuración utilizado es ``application-dev.properties``. Es recomendable mirar que su variable de entorno JAVA_HOME se encuentre bien configurada conforme a la de su dispositivo en ``launch-dev.bat``, que los contenedores Docker desplegados en [EntornoDesarrollojBPM] estén funcionando, y haber configurado el usuario con nombre y contraseña "controllerUser" y con rol "rest-all" en Business Central".
 
 Al ejecutar el modo developer, este abrirá el puerto 5005 para escuchar. Será necesario conectarse a este puerto para ejecutar el modo debug. Se proporciona el archivo ``launch.json`` para ejecutar en modo debug (IDE VisualStudioCode).
 

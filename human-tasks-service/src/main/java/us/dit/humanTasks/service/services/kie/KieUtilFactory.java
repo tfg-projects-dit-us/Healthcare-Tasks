@@ -51,7 +51,7 @@ import java.util.ArrayList;
  */
 
 @Service
-public class KieServerFactoryService {
+public class KieUtilFactory implements KieUtilFactoryService {
 
 	@Autowired
     private Environment env;
@@ -60,13 +60,13 @@ public class KieServerFactoryService {
 	
 	private List<KieServicesClient> serverList;
 
-    public KieServerFactoryService() {
-        logger.info("Constructor de KieServerFactoryService invocado.");
+    public KieUtilFactory() {
+        logger.info("Constructor de KieUtilFactory invocado.");
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        logger.info("Inicializando KieServerFactoryService...");
+    private void init() {
+        logger.info("Inicializando KieUtilFactory...");
         serverList = new ArrayList<>();
         int index = 0;
         boolean exit = false;
@@ -87,18 +87,18 @@ public class KieServerFactoryService {
         logger.info("Total de servidores KIE cargados: " + serverList.size());
     }
 	
-	public KieServicesClient buildClient(String location, String user, String password) {
+	private KieServicesClient buildClient(String location, String user, String password) {
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(location, user, password);
 		config.setMarshallingFormat(MarshallingFormat.JSON);
 		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
 		return client;
 	}
 
-	public List<KieServicesClient> getServerList() {
+	public List<KieServicesClient> getKieClientList() {
 		return serverList;
 	}
 
-	public List<UserTaskServicesClient> getTaskClientList() {
+	public List<UserTaskServicesClient> getUserTaskClientList() {
 		List<UserTaskServicesClient> taskClientList = new ArrayList<>();
 		for(KieServicesClient client: serverList){
 			UserTaskServicesClient taskClient = client.getServicesClient(UserTaskServicesClient.class);

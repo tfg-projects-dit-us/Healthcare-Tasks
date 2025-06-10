@@ -19,6 +19,7 @@ package us.dit.humanTasks.service.model;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Date;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import us.dit.humanTasks.service.services.kie.KieServerFactoryService;
 //import us.dit.humanTasks.service.services.kie.KieUtilService;
+import us.dit.humanTasks.service.services.kie.KieUtilFactoryService;
 
 /**
  * @author Marco Antonio Maldonado Orozco
@@ -59,91 +60,147 @@ public class TasksDAO {
 	private static final Logger logger = LogManager.getLogger();
 	
 	private static final String TASK_URI = "taskURI";
-
-	private static final String QUESTIONNAIRE_RESPONSE_URI = "questionnaireResponseURI";
 	
 	//Se intentará eliminar kie y usar sólo rtDS
 	//@Autowired
 	//private KieUtilService kie;
 	
 	@Autowired
-	private KieServerFactoryService kieSFS;
+	private KieUtilFactoryService kieUFS;
+
+	/*public Map<Integer,List<TaskSummary>> findAllTasks2(String user) {
+		Map<Integer,List<TaskSummary>> allTaskMap = new LinkedHashMap<>();;
+		//List<TaskSummary> finalTaskList = new ArrayList<>();
+		List<String> statusList = Arrays.asList("Reserved", "Completed", "InProgress", "Ready");
+		logger.info("Invocando findAllTasks con usuario: "+ user);
+		List<UserTaskServicesClient> clientList = kieUFS.getUserTaskClientList();
+		Integer serverIndex=0;
+		for(UserTaskServicesClient client: clientList){
+			List<TaskSummary> clientTaskList = client.findTasksAssignedAsPotentialOwner(user, statusList ,0, Integer.MAX_VALUE);
+			allTaskMap.put(serverIndex, clientTaskList);
+			serverIndex ++;
+		}
+		return allTaskMap;
+    }*/
 
 	/**
 	 * Find all jBPM tasks completed, assigned and potential for user
 	 * @param user
-	 * @return List<TaskSummary>
+	 * @return Map<Integer, List<TaskSummary>>
 	 */
-	public List<TaskSummary> findAllTasks(String user) {
-		List<TaskSummary> finalTaskList = new ArrayList<>();
+	public Map<Integer, List<TaskSummary>> findAllTasks(String user) {
+		Map<Integer, List<TaskSummary>> allTaskMap = new LinkedHashMap<>();
 		List<String> statusList = Arrays.asList("Reserved", "Completed", "InProgress", "Ready");
-		logger.info("Invocando findAllTasks con usuario: "+ user);
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for(UserTaskServicesClient client: clientList){
-			List<TaskSummary> clientTaskList = client.findTasksAssignedAsPotentialOwner(user, statusList ,0, Integer.MAX_VALUE);
-			finalTaskList.addAll(clientTaskList);
+		logger.info("Invocando findAllTasks con usuario: " + user);
+		List<UserTaskServicesClient> clientList = kieUFS.getUserTaskClientList();
+		Integer serverIndex = 0;
+		Date now = new Date(); // fecha actual
+
+		for (UserTaskServicesClient client : clientList) {
+			List<TaskSummary> clientTaskList = client.findTasksAssignedAsPotentialOwner(user, statusList, 0, Integer.MAX_VALUE);
+			
+			// Filtrar con fecha de expiración válida o que estén completadas
+			List<TaskSummary> filteredTasks = clientTaskList.stream()
+				.filter(task -> (task.getExpirationTime()==null || now.before(task.getExpirationTime())) || "Completed".equals(task.getStatus()) )
+				.collect(Collectors.toList());
+
+			// Se abortarán de las tareas con fecha de expiracion pasadas y que no estén completadas
+			List<TaskSummary> expiredTasks = clientTaskList.stream()
+				.filter(task -> !"Completed".equals(task.getStatus()))
+				.filter(task -> task.getExpirationTime()!=null) 
+				.filter(task -> now.after(task.getExpirationTime()))
+				.collect(Collectors.toList());
+			if(expiredTasks.size()>0){
+				exitTasks(user,client,expiredTasks);
+			}
+
+			allTaskMap.put(serverIndex, filteredTasks);
+			serverIndex++;
 		}
-		return finalTaskList;
-    }
+		return allTaskMap;
+	}
+
 	/**
 	 * Find all jBPM assigned tasks for user
 	 * @param user
-	 * @return List<TaskSummary>
+	 * @return Map<Integer, List<TaskSummary>>
 	 */
-	public List<TaskSummary> findAssignedTasks(String user) {
-		logger.info("Invocando findAssignedTasks con usuario: "+ user);
-		List<TaskSummary> allTasks = findAllTasks(user);
-	    return allTasks.stream()
-			.filter(task -> !"Completed".equals(task.getStatus()))
-			.filter(task -> user.equals(task.getActualOwner()))
-			.collect(Collectors.toList());
-    }
+	public Map<Integer, List<TaskSummary>> findAssignedTasks(String user) {
+		logger.info("Invocando findAssignedTasks con usuario: " + user);
+		Map<Integer, List<TaskSummary>> allTasksMap = findAllTasks(user);
+		Map<Integer, List<TaskSummary>> assignedTasksMap = new LinkedHashMap<>();
+
+		for (Map.Entry<Integer, List<TaskSummary>> entry : allTasksMap.entrySet()) {
+			List<TaskSummary> filteredTasks = entry.getValue().stream()
+				.filter(task -> !"Completed".equals(task.getStatus()))
+				.filter(task -> user.equals(task.getActualOwner()))
+				.collect(Collectors.toList());
+
+			if (!filteredTasks.isEmpty()) {
+				assignedTasksMap.put(entry.getKey(), filteredTasks);
+			}
+		}
+		return assignedTasksMap;
+	}
 	
 	/**
 	 * Find all jBPM potential tasks for user
 	 * @param user
-	 * @return List<TaskSummary>
+	 * @return Map<Integer, List<TaskSummary>>
 	 */
-	public List<TaskSummary> findPotentialTasks(String user) {
-		logger.info("Invocando findPotentialTasks con usuario: "+ user);
-		List<TaskSummary> allTasks = findAllTasks(user);
-		return allTasks.stream().filter(task -> task.getActualOwner() == null).collect(Collectors.toList());
-    }
+	public Map<Integer, List<TaskSummary>> findPotentialTasks(String user) {
+		logger.info("Invocando findPotentialTasks con usuario: " + user);
+		Map<Integer, List<TaskSummary>> allTasksMap = findAllTasks(user);
+		Map<Integer, List<TaskSummary>> potentialTasksMap = new LinkedHashMap<>();
+
+		for (Map.Entry<Integer, List<TaskSummary>> entry : allTasksMap.entrySet()) {
+			List<TaskSummary> filteredTasks = entry.getValue().stream()
+				.filter(task -> task.getActualOwner() == null)
+				.collect(Collectors.toList());
+
+			if (!filteredTasks.isEmpty()) {
+				potentialTasksMap.put(entry.getKey(), filteredTasks);
+			}
+		}
+		return potentialTasksMap;
+	}
 
 	/**
 	 * Find all jBPM completed tasks for user
 	 * @param user
-	 * @return List<TaskSummary>
+	 * @return Map<Integer, List<TaskSummary>>
 	 */
-	public List<TaskSummary> findCompletedTasks(String user) {
-		logger.info("Invocando findCompletedTasks con usuario: "+ user);
-		List<TaskSummary> allTasks = findAllTasks(user);
-		return allTasks.stream()
-		    .filter(task -> "Completed".equals(task.getStatus()))
-        	.filter(task -> user.equals(task.getActualOwner()))
-        	.collect(Collectors.toList());
-    }
+	public Map<Integer, List<TaskSummary>> findCompletedTasks(String user) {
+		logger.info("Invocando findCompletedTasks con usuario: " + user);
+		Map<Integer, List<TaskSummary>> allTasksMap = findAllTasks(user);
+		Map<Integer, List<TaskSummary>> completedTasksMap = new LinkedHashMap<>();
+
+		for (Map.Entry<Integer, List<TaskSummary>> entry : allTasksMap.entrySet()) {
+			List<TaskSummary> filteredTasks = entry.getValue().stream()
+				.filter(task -> "Completed".equals(task.getStatus()))
+				.filter(task -> user.equals(task.getActualOwner()))
+				.collect(Collectors.toList());
+
+			if (!filteredTasks.isEmpty()) {
+				completedTasksMap.put(entry.getKey(), filteredTasks);
+			}
+		}
+		return completedTasksMap;
+	}
+
 	
 	/**
 	 * Claim the jBPM Task with taskId for user
 	 * @param taskId
 	 * @param user
 	 * @param containerId
+	 * @param serverIndex
 	 */
-	public void claimTask(Long taskId, String user, String containerId) {
-	logger.info("Entrando en reclamar tarea ...");
-	List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-	for (UserTaskServicesClient client : clientList) {
-		try {
-			client.claimTask(containerId, taskId, user);
-			logger.info("Reclamada la tarea con id " + taskId + " del contenedor " + containerId + " para el usuario " + user);
-			return; // Salimos si se logra reclamar
-		} catch (Exception e) {
-		}
-    }
-		/*UserTaskServicesClient client = kie.getUserTaskServicesClient();
-		logger.info("Reclamar la tarea con id " + taskId + " del contenedor con id " + containerId + " para el usuario " + user);
-		client.claimTask(containerId, taskId, user);*/
+	public void claimTask(Long taskId, String user, String containerId, Integer serverIndex) {
+		logger.info("Entrando en reclamar tarea ...");
+		UserTaskServicesClient client = kieUFS.getUserTaskClientList().get(serverIndex);
+		client.claimTask(containerId, taskId, user);
+		logger.info("Reclamada la tarea con id " + taskId + " del contenedor " + containerId + " para el usuario " + user);
 	}
 	
 	/**
@@ -152,26 +209,35 @@ public class TasksDAO {
 	 * @param user
 	 * @param containerId
 	 * @param processInstanceId
+	 * @param serverIndex
 	 * @return String
 	 */
-	public String startTask(Long taskId, String user, String containerId, Long processInstanceId) {
+	public String startTask(Long taskId, String user, String containerId, Long processInstanceId, Integer serverIndex) {
 		logger.info("Comenzar la tarea con id " + taskId + " del contenedor con id " + containerId);
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for (UserTaskServicesClient client : clientList) {
-			try {
-				client.startTask(containerId,taskId,user);
-				Map<String, Object> inputData = client.getTaskInputContentByTaskId(containerId,taskId);
-				logger.info("La tarea "+taskId+" tiene como entrada "+inputData);
-				/**
-				 * Las tareas humanas tienen que tener una entrada TASK_URI en la que se pase la url de la tarea
-				 */
-				String taskURI= inputData.get(TASK_URI).toString();
-				logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
-				return taskURI;
-			} catch (Exception e) {
-			}
+		UserTaskServicesClient client = kieUFS.getUserTaskClientList().get(serverIndex);
+		client.startTask(containerId,taskId,user);
+		Map<String, Object> inputData = client.getTaskInputContentByTaskId(containerId,taskId);
+		logger.info("La tarea "+taskId+" tiene como entrada "+inputData);
+		/**
+		 * Las tareas humanas tienen que tener una entrada TASK_URI en la que se pase la url de la tarea
+		 */
+		String taskURI= inputData.get(TASK_URI).toString();
+		logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
+		return taskURI;
+	}
+
+	/**
+	 * Exit the jBPM task list when a task expires
+	 * @param user
+	 * @param client
+	 * @param tasks
+	 */
+	private void exitTasks(String user, UserTaskServicesClient client, List<TaskSummary> tasks){
+		for (TaskSummary expiredTask : tasks) {
+			String containerId = expiredTask.getContainerId();
+			Long taskId = expiredTask.getId();
+			client.exitTask(containerId, taskId, user);
 		}
-		return null;
 	}
 	
 	/**
@@ -180,20 +246,15 @@ public class TasksDAO {
 	 * @param user
 	 * @param containerId
 	 * @param processInstanceId
-	 * @return
+	 * @param serverIndex
+	 * @return String
 	 */
-	public String continueTask(Long taskId, String user, String containerId, Long processInstanceId) {
+	public String continueTask(Long taskId, String user, String containerId, Long processInstanceId, Integer serverIndex) {
 		logger.info("Continuar la tarea con id " + taskId + " del contenedor con id " + containerId);
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for (UserTaskServicesClient client : clientList) {
-			try {
-				String taskURI=client.getTaskInputContentByTaskId(containerId,taskId).get(TASK_URI).toString();
-				logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
-        		return taskURI;
-			} catch (Exception e) {
-			}
-		}
-		return null;
+		UserTaskServicesClient client = kieUFS.getUserTaskClientList().get(serverIndex);
+		String taskURI=client.getTaskInputContentByTaskId(containerId,taskId).get(TASK_URI).toString();
+		logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
+		return taskURI;
 	}
 	
 	/**
@@ -201,86 +262,35 @@ public class TasksDAO {
 	 * @param taskId
 	 * @param user
 	 * @param containerId
+	 * @param serverIndex
 	 */
-	public void rejectTask(Long taskId, String user, String containerId) {
-		/*UserTaskServicesClient client = kie.getUserTaskServicesClient();
-		logger.info("Rechazar la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
-		client.releaseTask(containerId, taskId, user);*/
+	public void rejectTask(Long taskId, String user, String containerId, Integer serverIndex) {
 		logger.info("Entrando en rechazar tarea ...");
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for (UserTaskServicesClient client : clientList) {
-			try {
-				client.releaseTask(containerId, taskId, user);
-				logger.info("Rechazada la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
-				return;
-			} catch (Exception e) {
-			}
-		}
+		UserTaskServicesClient client = kieUFS.getUserTaskClientList().get(serverIndex);
+		client.releaseTask(containerId, taskId, user);
+		logger.info("Rechazada la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
 	}
 	
 	/**
 	 * Complete the jBPM task with taskId
 	 * @param taskId
-	 * @throws Exception
+	 * @param questionnaireResponseId
+	 * @param serverIndex
 	 */
-	public void completeTask(Long taskId, String questionnaireResponseId) throws Exception {
+	public void completeTask(Long taskId, Integer serverIndex) throws Exception {
 		logger.info("Entrando en completar tarea ...");
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for (UserTaskServicesClient client : clientList) {
-			try {
+		UserTaskServicesClient client = kieUFS.getUserTaskClientList().get(serverIndex);
 				TaskInstance taskInstance = client.findTaskById(taskId);
 				String containerId = taskInstance.getContainerId();
 				String user = taskInstance.getActualOwner();
 				//We store as a process variable the questionnaireResponseId generated when we complete the task
 				Map<String,Object> variables= new HashMap<String,Object>();
-				/**
-				 * Las tareas humanas tienen que tener una salida QUESTIONNAIRE_RESPONSE_URI en la que se pase la url del cuestionario respuesta
-				 */
-				variables.put(QUESTIONNAIRE_RESPONSE_URI, questionnaireResponseId);
-				//Expiration Date is now a Completion Date
+
+				//La fecha de expiración será representativa de la fecha de entrega una vez completada la tarea
 				Date completionDate = new Date();
 				client.setTaskExpirationDate(containerId, taskId, completionDate);
 				client.completeTask(containerId, taskId, user, variables);
 				logger.info("Completada la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
-				return;
-			} catch (Exception e) {
-			}
-		}
-		/*UserTaskServicesClient client = kie.getUserTaskServicesClient();
-		TaskInstance taskInstance = client.findTaskById(taskId);
-		String containerId = taskInstance.getContainerId();
-		String user = taskInstance.getActualOwner();
-		logger.info("Completar la tarea con id " + taskId + " del contenedor con id " + containerId + " del usuario " + user);
-		//We store as a process variable the questionnaireResponseId generated when we complete the task
-		Map<String,Object> variables= new HashMap<String,Object>();
-	    variables.put("questionnaireResponseURI", questionnaireResponseId);
-		//Expiration Date is now a Completion Date
-		Date completionDate = new Date();
-		client.setTaskExpirationDate(containerId, taskId, completionDate);
-		client.completeTask(containerId, taskId, user, variables);*/
-	}
-
-	/**
-	 * Return the FHIR Task id associated to the jBPM Task
-	 * @param taskId
-	 * @param user
-	 * @param containerId
-	 * @param processInstanceId
-	 * @return
-	 */
-	public String viewTask(Long taskId, String user, String containerId, Long processInstanceId) {
-		logger.info("Ver la tarea con id " + taskId + " del contenedor con id " + containerId);
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for (UserTaskServicesClient client : clientList) {
-			try {
-				String taskURI=client.getTaskInputContentByTaskId(containerId,taskId).get(TASK_URI).toString();
-				String questionnaireResponseURI=client.getTaskOutputContentByTaskId(containerId,taskId).get(QUESTIONNAIRE_RESPONSE_URI).toString();
-				logger.info("La tarea con id " + taskId +" y URI"+ taskURI + " está relacionada con el cuestionario respuesta fhir con id " + questionnaireResponseURI);
-				return questionnaireResponseURI;
-			} catch (Exception e) {
-			}
-		}
-		return null;
 	}
 	
 	/**
@@ -288,20 +298,15 @@ public class TasksDAO {
 	 * @param taskId
 	 * @param containerId
 	 * @param processInstanceId
-	 * @return
+	 * @param serverIndex
+	 * @return String
 	 */
-	public String getTaskURIFromTaskInputContent(Long taskId, String containerId, Long processInstanceId) {
+	public String getTaskURIFromTaskInputContent(Long taskId, String containerId, Long processInstanceId, Integer serverIndex) {
 		logger.debug("Entrando en getTaskUri con taskId "+taskId+" containerId "+" processInstanceId "+processInstanceId);
-		List<UserTaskServicesClient> clientList = kieSFS.getTaskClientList();
-		for (UserTaskServicesClient client : clientList) {
-			try {
-				String taskURI = client.getTaskInputContentByTaskId(containerId,taskId).get(TASK_URI).toString();   
-				logger.debug("TaskURI con el cliente inyectado " + taskURI);
-				return taskURI;
-			} catch (Exception e) {
-			}
-		}
-		return null;
+		UserTaskServicesClient client = kieUFS.getUserTaskClientList().get(serverIndex);
+		String taskURI = client.getTaskInputContentByTaskId(containerId,taskId).get(TASK_URI).toString();   
+		logger.debug("TaskURI con el cliente inyectado " + taskURI);
+		return taskURI;
 	}
 	
 	/************************PARA FUTURO******************************/
@@ -310,14 +315,14 @@ public class TasksDAO {
 	 * @param user
 	 * @return List<TaskSummary>
 	 */
-	public List<TaskSummary> findAllPotentialPendingTasksExpirationDateOrdered(String user) {
+	/*public List<TaskSummary> findAllPotentialPendingTasksExpirationDateOrdered(String user) {
 		Comparator<TaskSummary> comparator = Comparator.nullsLast(
 	            Comparator.comparing(TaskSummary::getExpirationTime, Comparator.nullsLast(Comparator.naturalOrder()))
 	        );
 		return this.findAllTasks(user).stream()
 				.sorted(comparator)
 				.collect(Collectors.toList());
-	}
+	}*/
 	 
 	/**
 	 * TODO: aquí aparece el nombre de contenedor, esto no debería estar aquí....

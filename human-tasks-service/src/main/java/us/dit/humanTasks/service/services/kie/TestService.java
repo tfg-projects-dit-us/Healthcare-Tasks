@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import us.dit.humanTasks.service.model.FhirTasksDAO;
 
 
 
@@ -50,17 +51,20 @@ public class TestService {
 
 	private static final Logger logger = LogManager.getLogger();
 	
-	//@Autowired
-	//private KieUtilService kie;
+	@Autowired
+	private FhirTasksDAO fhir;
 
-	@Value("${test.taskid}")
-	private String taskId;
+	@Autowired
+	private KieUtilFactoryService kieUFS;
+
+	@Value("${test.questionnaireid}")
+	private String questionnaireId;
+
+	@Value("${fhir.server.base}")
+	private String serverBase;
 
 	@Value("${test.containerid}")
 	private String containerId;
-
-	@Value("${test.roleprocess}")
-	private String rolP;
 
 	@Value("${test.userprocess}")		
 	private String userP;
@@ -69,7 +73,9 @@ public class TestService {
 	 * Instancia un proceso con una tarea humana asignada al rol kie-server
 	 * @return el id del proceso instanciado
 	 */
-	public Long newTareaARol(ProcessServicesClient client, String roleprocess,String subject, int days,int hours, int minutes) {
+	public Long newTareaARol(Integer serverIndex, String roleprocess,String subject, int days,int hours, int minutes) {
+		ProcessServicesClient client = kieUFS.getProcessClientList().get(serverIndex);
+		String taskId=fhir.createTask(serverBase, questionnaireId);
 		// Obtain the current date and time in UTC
         ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
 				.plusDays(days)
@@ -79,7 +85,7 @@ public class TestService {
         String expirationDateTimeISO8601 = expirationDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX"));
 		Map<String,Object> variables= new HashMap<>();
         logger.info("Entro en newTareaARol");
-	    variables.put("taskURI", taskId);
+	    variables.put("taskURI", taskId );
 		variables.put("p_DueDate", expirationDateTimeISO8601);
 		variables.put("p_Subject", subject);
 		Long idInstanceProcess = client.startProcess(containerId, roleprocess ,variables);
@@ -91,7 +97,9 @@ public class TestService {
 	 * @param principal usuario al que se le asigna la tarea
 	 * @return el id del proceso instanciado
 	 */
-	public Long newTareaAUsuario(ProcessServicesClient client, String principal,String subject, int days,int hours, int minutes) {
+	public Long newTareaAUsuario(Integer serverIndex, String principal,String subject, int days,int hours, int minutes) {
+		ProcessServicesClient client = kieUFS.getProcessClientList().get(serverIndex);
+		String taskId=fhir.createTask(serverBase, questionnaireId);
 		// Obtain the current date and time in UTC
         ZonedDateTime expirationDateTime = ZonedDateTime.now(ZoneOffset.UTC)
 				.plusDays(days)

@@ -81,5 +81,16 @@
       <messages/>
       <containerAlias>human-tasks-management</containerAlias>
     </container>
+    <container>
+      <containerId>human-tasks-management-aplication-server</containerId>
+      <releaseId>
+        <groupId>us.dit</groupId>
+        <artifactId>human-tasks-management</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+      </releaseId>
+      <status>STARTED</status>
+      <configItems/>
+      <messages/>
+    </container>
   </containers>
 </kie-server-state>

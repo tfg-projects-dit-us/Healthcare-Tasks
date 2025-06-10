@@ -47,7 +47,7 @@ goto :startapp
 		cd target
 		for /f "delims=" %%x in ('dir /od /b *.jar') do set latestjar=%%x
 		cd ..
-		call java -jar target\!latestjar!
+		call java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar target\!latestjar!
 REM		call java -Dorg.kie.server.bypass.auth.user=true -Dorg.kie.server.pwd=consentimientos -Dorg.kie.server.user=consentimientos -jar target\!latestjar!
 	)
 

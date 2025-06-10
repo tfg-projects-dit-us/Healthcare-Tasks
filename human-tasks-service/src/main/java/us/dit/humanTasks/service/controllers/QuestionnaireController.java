@@ -52,7 +52,7 @@ public class QuestionnaireController {
 	 * @return String
 	 */
 	@GetMapping() 
-	public String getQuestionnaire(@RequestParam("taskId") String taskId, @RequestParam("taskURI") String taskURI, Model model) {
+	public String getQuestionnaire(@RequestParam("taskId") String taskId, @RequestParam("taskURI") String taskURI, @RequestParam("serverIndex") Integer serverIndex, Model model) {
 		logger.info("Entro en getQuestionnaire del controlador Http para la taskURI "+taskURI);	
 		
 		Questionnaire questionnaire = questionnaireDAO.getQuestionnaireFromTask(taskURI);
@@ -60,10 +60,11 @@ public class QuestionnaireController {
 			
 			//Id de la tarea de businessCentral para saber qué tarea jbpm hay que completar cuando se envíe el cuestionario
 			model.addAttribute("taskId", taskId);
-			
 			//Id de la tarea fhir para saber qué tarea fhir hay que completar cuando se envíe el cuestionario
 			model.addAttribute("taskURI", taskURI);
-			
+			//Índice del servidor donde se encuentra la tarea asociada al cuestionario
+			model.addAttribute("serverIndex", serverIndex);
+
 			model.addAttribute("questionnaire", questionnaire);
 			return "questionnaireForm";
 		} else {

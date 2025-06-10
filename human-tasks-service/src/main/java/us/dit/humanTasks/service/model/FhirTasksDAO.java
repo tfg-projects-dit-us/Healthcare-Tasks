@@ -36,7 +36,10 @@ import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
 import ca.uhn.fhir.util.UrlUtil;
 
 import org.hl7.fhir.r5.model.Task;
+import org.hl7.fhir.r5.model.Task.TaskInputComponent;
 import org.hl7.fhir.r5.model.Task.TaskOutputComponent;
+import org.hl7.fhir.r5.model.Task.TaskIntent;
+import org.hl7.fhir.r5.model.Task.TaskStatus;
 
 
 /**
@@ -111,9 +114,9 @@ public class FhirTasksDAO {
         task.addOutput(outputComponent);
 
         MethodOutcome outcome = client.update().resource(task).execute();
-        responseId = outcome.getId().getValueAsString();
+        responseId = outcome.getId().toVersionless().getValue();
 	
-		return questionnaireResponseId;
+		return responseId;
 	}
 	/**
 	 * Busca el servidor base de la url de la tarea que se pasa, si no es la url de un Task devuelve null
@@ -160,6 +163,55 @@ public class FhirTasksDAO {
 				}
 				return task;		
 	}
+
+	/**
+	 * Persiste en el servidor FHIR la tarea asociada a un id de cuestionario. Método de pruebas usado para los tests.
+	 * @param questionnaireId //id del cuestionario ligado a la tarea
+	 * @param serverBase //url del servidor fhir
+	 * @return la uri de la tarea
+	 */
+    public String createTask(String serverBase, String questionnaireId) {
+        FhirContext ctx = FhirContext.forR5();
+        IGenericClient client = ctx.newRestfulGenericClient(serverBase);
+        // Crear Task
+        Task task = new Task();
+        task.setStatus(TaskStatus.READY);
+        task.setIntent(TaskIntent.ORDER);
+        // Crear entrada (input)
+        TaskInputComponent input = new TaskInputComponent();
+        input.setType(new CodeableConcept().addCoding(new Coding()
+            .setSystem("http://terminology.hl7.org/CodeSystem/task-input-type")
+            .setCode("closingQuestionnaire"))
+            .setText("Id del cuestionario de cierre de la tarea"));
+        input.setValue(new StringType(questionnaireId));
+        task.addInput(input);
+        // Enviar al servidor FHIR
+        MethodOutcome outcome = client.create().resource(task).execute();
+        logger.debug("Task creada con ID: " + outcome.getId().toVersionless().getValue());
+		return outcome.getId().toVersionless().getValue();
+    }
+
+	/**
+     * Obtiene la URI del cuestionario respuesta de una tarea a partir de su URI.
+	 * @param url //url de la tarea fhir
+	 * @return la uri del cuestionario respuesta
+     */
+    public String getQuestionnaireResponseId(String url) {
+		Task task = getTask(url);
+        // Buscar en outputs el tipo que contenga "closingQuestionnaireResponse"
+        for (TaskOutputComponent output : task.getOutput()) {
+            if (output.getType() != null &&
+                output.getType().hasCoding() &&
+                output.getType().getCodingFirstRep().getCode().equals("closingQuestionnaireResponse")) {
+
+                if (output.getValue() instanceof StringType) {
+                    return ((StringType) output.getValue()).getValue();
+                }
+            }
+        }
+        // Si no se encuentra
+        return null;
+    }
 	
 	/**
 	 * Persist in FHIR server the QuestionnaireResponse built from Questionnaire answers
@@ -187,5 +239,8 @@ public class FhirTasksDAO {
 	    logger.info("Id del QuestionnaireResponse persistido " + responseId);
 		return responseId;	
 	}
+
+
+	
 
 }

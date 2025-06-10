@@ -94,6 +94,7 @@ public class FormController {
     		@RequestParam("questionnaireId") String questionnaireUrl,
     		@RequestParam("taskId") Long taskId,
     		@RequestParam("taskURI") String taskURI,
+            @RequestParam("serverIndex") Integer serverIndex,
     		RedirectAttributes redirectAttributes) {
     	logger.debug("Processando /submit del cuestionario inicial con questionnaireId"+ questionnaireUrl);
         try {
@@ -114,7 +115,7 @@ public class FormController {
 	       
 	        //printQuestionnaireResponseItems(questionnaireResponse);
 
-        	completeTasks(taskURI, questionnaireResponse, taskId);
+        	completeTasks(taskURI, questionnaireResponse, taskId, serverIndex);
         	redirectAttributes.addFlashAttribute("message", "task.complete.success");
             redirectAttributes.addFlashAttribute("alertClass", "success");
         } catch(Exception e) {
@@ -135,9 +136,9 @@ public class FormController {
      * @param taskId
      * @throws Exception
      */
-    private void completeTasks(String taskURI, QuestionnaireResponse questionnaireResponse, Long taskId) throws Exception {
-    	String questionnaireResponseId = fhirDao.completeTask(taskURI, questionnaireResponse);
-    	tasksDao.completeTask(taskId, questionnaireResponseId);
+    private void completeTasks(String taskURI, QuestionnaireResponse questionnaireResponse, Long taskId, Integer serverIndex) throws Exception {
+    	fhirDao.completeTask(taskURI, questionnaireResponse);
+    	tasksDao.completeTask(taskId, serverIndex);
     }
     
     /**
