@@ -89,7 +89,7 @@ public class TestService {
 		variables.put("p_DueDate", expirationDateTimeISO8601);
 		variables.put("p_Subject", subject);
 		Long idInstanceProcess = client.startProcess(containerId, roleprocess ,variables);
-		logger.info("Instanciado proceso " + idInstanceProcess.toString());
+		logger.info("Instanciado proceso " + idInstanceProcess.toString() + " con la tarea FHIR asociada " + taskId);
 		return idInstanceProcess;
 	}
 	/**
@@ -114,7 +114,7 @@ public class TestService {
 		variables.put("p_DueDate", expirationDateTimeISO8601);
 		variables.put("p_Subject", subject);
 		Long idInstanceProcess = client.startProcess(containerId, userP,variables);
-		logger.info("Instanciado proceso " + idInstanceProcess.toString());
+		logger.info("Instanciado proceso " + idInstanceProcess.toString() + " con la tarea FHIR asociada " + taskId);
 		return idInstanceProcess;
 	}	
 }
