@@ -196,6 +196,7 @@ public class TasksController {
         String taskURI = taskDao.continueTask(taskId, actualOwner, containerId, processInstanceId, serverIndex);
         redirectAttributes.addAttribute(TASK_ID, taskId);
         redirectAttributes.addAttribute(TASK_URI, taskURI);
+		redirectAttributes.addAttribute(SERVER_INDEX, serverIndex);
         return new RedirectView("/questionnaire");
     }
 	

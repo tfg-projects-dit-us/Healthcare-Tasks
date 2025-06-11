@@ -68,7 +68,7 @@ public class TasksDAO {
 	@Autowired
 	private KieUtilFactoryService kieUFS;
 
-	/*public Map<Integer,List<TaskSummary>> findAllTasks2(String user) {
+	public Map<Integer,List<TaskSummary>> findAllTasks(String user) {
 		Map<Integer,List<TaskSummary>> allTaskMap = new LinkedHashMap<>();;
 		//List<TaskSummary> finalTaskList = new ArrayList<>();
 		List<String> statusList = Arrays.asList("Reserved", "Completed", "InProgress", "Ready");
@@ -81,44 +81,7 @@ public class TasksDAO {
 			serverIndex ++;
 		}
 		return allTaskMap;
-    }*/
-
-	/**
-	 * Find all jBPM tasks completed, assigned and potential for user
-	 * @param user
-	 * @return Map<Integer, List<TaskSummary>>
-	 */
-	public Map<Integer, List<TaskSummary>> findAllTasks(String user) {
-		Map<Integer, List<TaskSummary>> allTaskMap = new LinkedHashMap<>();
-		List<String> statusList = Arrays.asList("Reserved", "Completed", "InProgress", "Ready");
-		logger.info("Invocando findAllTasks con usuario: " + user);
-		List<UserTaskServicesClient> clientList = kieUFS.getUserTaskClientList();
-		Integer serverIndex = 0;
-		Date now = new Date(); // fecha actual
-
-		for (UserTaskServicesClient client : clientList) {
-			List<TaskSummary> clientTaskList = client.findTasksAssignedAsPotentialOwner(user, statusList, 0, Integer.MAX_VALUE);
-			
-			// Filtrar con fecha de expiración válida o que estén completadas
-			List<TaskSummary> filteredTasks = clientTaskList.stream()
-				.filter(task -> (task.getExpirationTime()==null || now.before(task.getExpirationTime())) || "Completed".equals(task.getStatus()) )
-				.collect(Collectors.toList());
-
-			// Se abortarán de las tareas con fecha de expiracion pasadas y que no estén completadas
-			List<TaskSummary> expiredTasks = clientTaskList.stream()
-				.filter(task -> !"Completed".equals(task.getStatus()))
-				.filter(task -> task.getExpirationTime()!=null) 
-				.filter(task -> now.after(task.getExpirationTime()))
-				.collect(Collectors.toList());
-			if(expiredTasks.size()>0){
-				exitTasks(user,client,expiredTasks);
-			}
-
-			allTaskMap.put(serverIndex, filteredTasks);
-			serverIndex++;
-		}
-		return allTaskMap;
-	}
+    }
 
 	/**
 	 * Find all jBPM assigned tasks for user
@@ -225,20 +188,6 @@ public class TasksDAO {
 		logger.info("La tarea con id " + taskId + " está relacionada con la tarea fhir con id " + taskURI);
 		return taskURI;
 	}
-
-	/**
-	 * Exit the jBPM task list when a task expires
-	 * @param user
-	 * @param client
-	 * @param tasks
-	 */
-	private void exitTasks(String user, UserTaskServicesClient client, List<TaskSummary> tasks){
-		for (TaskSummary expiredTask : tasks) {
-			String containerId = expiredTask.getContainerId();
-			Long taskId = expiredTask.getId();
-			client.exitTask(containerId, taskId, user);
-		}
-	}
 	
 	/**
 	 * Return the FHIR Task id associated to the jBPM Task
@@ -310,6 +259,55 @@ public class TasksDAO {
 	}
 	
 	/************************PARA FUTURO******************************/
+	/**
+	 * Find all jBPM tasks completed, assigned and potential for user
+	 * @param user
+	 * @return Map<Integer, List<TaskSummary>>
+	 */
+	/*public Map<Integer, List<TaskSummary>> findAllTasks(String user) {
+		Map<Integer, List<TaskSummary>> allTaskMap = new LinkedHashMap<>();
+		List<String> statusList = Arrays.asList("Reserved", "Completed", "InProgress", "Ready");
+		logger.info("Invocando findAllTasks con usuario: " + user);
+		List<UserTaskServicesClient> clientList = kieUFS.getUserTaskClientList();
+		Integer serverIndex = 0;
+		Date now = new Date(); // fecha actual
+
+		for (UserTaskServicesClient client : clientList) {
+			List<TaskSummary> clientTaskList = client.findTasksAssignedAsPotentialOwner(user, statusList, 0, Integer.MAX_VALUE);
+			
+			// Filtrar con fecha de expiración válida o que estén completadas
+			List<TaskSummary> filteredTasks = clientTaskList.stream()
+				.filter(task -> (task.getExpirationTime()==null || now.before(task.getExpirationTime())) || "Completed".equals(task.getStatus()) )
+				.collect(Collectors.toList());
+
+			// Se abortarán de las tareas con fecha de expiracion pasadas y que no estén completadas
+			List<TaskSummary> expiredTasks = clientTaskList.stream()
+				.filter(task -> !"Completed".equals(task.getStatus()))
+				.filter(task -> task.getExpirationTime()!=null) 
+				.filter(task -> now.after(task.getExpirationTime()))
+				.collect(Collectors.toList());
+			if(expiredTasks.size()>0){
+				exitTasks(user,client,expiredTasks);
+			}
+
+			allTaskMap.put(serverIndex, filteredTasks);
+			serverIndex++;
+		}
+		return allTaskMap;
+	}*/
+	/**
+	 * Exit the jBPM task list when a task expires
+	 * @param user
+	 * @param client
+	 * @param tasks
+	 */
+	/*private void exitTasks(String user, UserTaskServicesClient client, List<TaskSummary> tasks){
+		for (TaskSummary expiredTask : tasks) {
+			String containerId = expiredTask.getContainerId();
+			Long taskId = expiredTask.getId();
+			client.exitTask(containerId, taskId, user);
+		}
+	}*/
 	/**
 	 * Finds potentialTasks ordered by expiratoin date
 	 * @param user

@@ -64,6 +64,7 @@ Dado que el servicio está desarrollado como una aplicación de negocios con un 
 #nombre del contenedor desplegado en el servidor kie
 test.containerid=human-tasks-management-kjar-1.0.0-SNAPSHOT
 #nombres de procesos que contienes una tarea asignada al role wbadmin
+test.roleprocessWithoutTimer=HumanTasksManagement.TareaARoleSinTimer
 test.roleprocessHigh=HumanTasksManagement.TareaARolUrgente
 test.roleprocessMedium=HumanTasksManagement.TareaARolMedia
 test.roleprocessLow=HumanTasksManagement.TareaARolLeve
@@ -76,6 +77,7 @@ Para poder crear instancias de estos procesos la aplicación publica dos endpoin
 * `/test/initTareaARol?serverIndex=..`: arranca en el servidor indicado una instancia del proceso `TareaARoleLeve`
 * `/test/initTareaAUsuario?serverIndex=..`: arranca en el servidor indicado una instancia del proceso `TareaAUsuario`
 * `/test/initTareasARolMuestra?serverIndex=..`: arranca en el servidor indicado instancias de los procesos `TareaARoleLeve`, `TareaARoleMedia`, `TareaARoleUrgente`
+* `/test/initTareaARolSinTimer?serverIndex=..`: arranca en el servidor indicado una instancia del proceso `TareaARoleSinTimer`
 
 Estos endpoint son sólo para facilitar las pruebas y deberán desaparecer en la versión en producción.
 
