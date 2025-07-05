@@ -8,9 +8,9 @@ En este paquete encontrará diversos recursos para facilitarle la tarea de confi
 
 Esta aplicación utiliza un servidor FHIR para persistir y consultar los cuestionarios y tareas FHIR, maneja los recursos `Questionnaire`, `Task` y `QuestionnaireResponse`
 
-El servidor FHIR de respaldo se configura en el archivo `application.properties` del servicio. Por defecto se utiliza el <a href="https://hapi.fhir.org/baseR5/swagger-ui/">servidor de test, versión R5,</a> de Hapi Fhir, iniciativa respaldada por <a href="https://www.smiledigitalhealth.com/">Smile Digital</a> Si ha desplegado el entorno de desarrollo también puede conectarse al servidor local FHIR http://localhost:8888/fhir.
+El servidor FHIR de respaldo se configura en los archivos `xxxx.properties` del servicio, según el modo de ejecución. Por defecto se utiliza el <a href="https://hapi.fhir.org/baseR5/swagger-ui/">servidor de test, versión R5,</a> de Hapi Fhir, iniciativa respaldada por <a href="https://www.smiledigitalhealth.com/">Smile Digital</a> Si ha desplegado el entorno de desarrollo también puede conectarse al servidor local FHIR http://localhost:8888/fhir.
 
-El servidor aloja los recursos `Task` asociados a una tarea humana en el proceso. La versión actual de los procesos de prueba genera estos recursos. Sin embargo, La versión actual de los procesos no generan los recursos `Questionnaire` que representan los datos solicitados al usuario para cerrar la tarea, por lo que también deben estar previamente alojados en el servidor.
+El servidor aloja los recursos `Task` asociados a una tarea humana en el proceso. La versión actual de los controladores de test genera estos recursos. Sin embargo, no generan los recursos `Questionnaire` que representan los datos solicitados al usuario para cerrar la tarea, por lo que también deben estar previamente alojados en el servidor.
 
 El json proporcionado en este paquete (`Questionnaire.json`) es un ejemplo de este recurso, y debe estar almacenado previamente en el servidor FHIR. Para ello deberá:
 
@@ -21,7 +21,7 @@ El json proporcionado en este paquete (`Questionnaire.json`) es un ejemplo de es
 <img src="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/resources/img/RespuestaCreacionQuestionnaire.jpg" width="500" />
 
 
-* Configurar el fichero application.properties y en la propiedad test.questionnaireid poner el identificador del cuestionario que acaba de crear en el paso anterior
+* Configurar el fichero xxxx.properties y en la propiedad test.questionnaireid poner el identificador del cuestionario que acaba de crear en el paso anterior
 
 En futuras versiones de esta solución este procedimiento será automático y no será necesaria la configuración previa.
 
@@ -54,9 +54,8 @@ Se presenta también la configuración necesaria para JPA, api utilizada para la
 ## Procesos de test
 
 Para verificar la aplicación será necesario poder instanciar procesos que contengan tareas humanas. Para ello se ha utilizado Business Central, de KIE, para crear el proyecto “human-tasks
-management", incluido en esta distribución en el paquete human-tasks-management-kjar, donde se definen una serie de procesos simples entre los que destacan principalmente dos:
-* <a href="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/human-tasks-management-kjar/src/main/resources/HumanTasksManagement.TareaARol-svg.svg">TareaARole</a>: que crea una tarea ligada al rol webadmin, de modo que cualquier usuario con este rol podrá reclamarla y ejecutarla
-* <a href="https://github.com/tfg-projects-dit-us/Healthcare-Tasks/blob/master/human-tasks-management-kjar/src/main/resources/HumanTasksManagement.TareaAUsuario-svg.svg">TareaAUsuario</a>: que crea una tarea asignada al usuario que cree la instancia
+management", incluido en esta distribución en el paquete human-tasks-management-kjar, donde se definen una serie de procesos simples entre los que destacan principalmente cuatro: TareaARoleLeve, TareaARoleMedia y TareaARoleUrgente, que crean una tarea ligada al rol webadmin, de modo que cualquier usuario con este rol podrá reclamarla y ejecutarla.
+Y TareaAUsuario, que crea una tarea asignada al usuario que cree la instancia.
 
 Dado que el servicio está desarrollado como una aplicación de negocios con un motor kie embebido, al arrancar la aplicación se cargará un contenedor con estos procesos disponibles. La información necesaria para realizar los tests (id del contenedor y de los procesos) se configura en el fichero de propiedades de la aplicación:
 
@@ -64,22 +63,21 @@ Dado que el servicio está desarrollado como una aplicación de negocios con un 
 #nombre del contenedor desplegado en el servidor kie
 test.containerid=human-tasks-management-kjar-1.0.0-SNAPSHOT
 #nombres de procesos que contienes una tarea asignada al role wbadmin
-test.roleprocessWithoutTimer=HumanTasksManagement.TareaARoleSinTimer
 test.roleprocessHigh=HumanTasksManagement.TareaARolUrgente
 test.roleprocessMedium=HumanTasksManagement.TareaARolMedia
 test.roleprocessLow=HumanTasksManagement.TareaARolLeve
 #nombre del proceso que asigna una tarea al usuario que lo inicia
 test.userprocess=human-tasks-management.TareaAUsuario
 ```
-## Instanciar los procesos de test
+## Controladores de test
 Para poder crear instancias de estos procesos la aplicación publica dos endpoint que atienden peticiones get, están definidos en la clase `TestController`
 
 * `/test/initTareaARol?serverIndex=..`: arranca en el servidor indicado una instancia del proceso `TareaARoleLeve`
 * `/test/initTareaAUsuario?serverIndex=..`: arranca en el servidor indicado una instancia del proceso `TareaAUsuario`
 * `/test/initTareasARolMuestra?serverIndex=..`: arranca en el servidor indicado instancias de los procesos `TareaARoleLeve`, `TareaARoleMedia`, `TareaARoleUrgente`
-* `/test/initTareaARolSinTimer?serverIndex=..`: arranca en el servidor indicado una instancia del proceso `TareaARoleSinTimer`
 
 Estos endpoint son sólo para facilitar las pruebas y deberán desaparecer en la versión en producción.
+Se puede obtener el índice asignado a cada servidor en las trazas de la aplicación. (Si ninguna conexión falla coincidirá con el orden de definición en el fichero de configuración)
 
 ## Cierre de sesión
 
