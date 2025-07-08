@@ -1,6 +1,6 @@
 /**
 *  This file is part of Healthcare Tasks: Human task management in healthcare contexts.
-*  Copyright (C) 2024  Universidad de Sevilla/Departamento de Ingeniería Telemática
+*  Copyright (C) 2025  Universidad de Sevilla/Departamento de Ingeniería Telemática
 *
 *  Healthcare Tasks is free software: you can redistribute it and/or
 *  modify it under the terms of the GNU General Public License as published
@@ -27,7 +27,7 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
-
+import org.kie.server.client.helper.KieServicesClientBuilder;
 //import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -78,21 +78,27 @@ public class KieUtilFactory implements KieUtilFactoryService {
             if (location == null || user == null || pwd == null) {
                 exit = true;
             }else{
-                logger.info("Creando cliente para servidor KIE: " + location);
                 KieServicesClient client = buildClient(location, user, pwd);
-                serverList.add(client);
+                if(client != null){
+                    serverList.add(client);
+                    logger.info("Creado cliente para servidor KIE " + location + " con indice " + (serverList.size()-1)); 
+                }
                 index++;
             }
         }
         logger.info("Total de servidores KIE cargados: " + serverList.size());
     }
-	
-	private KieServicesClient buildClient(String location, String user, String password) {
-		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(location, user, password);
-		config.setMarshallingFormat(MarshallingFormat.JSON);
-		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
-		return client;
-	}
+
+    private KieServicesClient buildClient(String location, String user, String password) {
+        try {
+            KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(location, user, password);
+            config.setMarshallingFormat(MarshallingFormat.JSON);
+            return KieServicesFactory.newKieServicesClient(config);
+        } catch (Exception e) {
+            logger.info("No se pudo establecer la conexión con el KIE Server: " + location);
+            return null;
+        }
+    }
 
 	public List<KieServicesClient> getKieClientList() {
 		return serverList;

@@ -1,0 +1,3 @@
+Este directorio contiene el fichero launch.json, necesario para ejecutar el modo depuración. Solo útil si está usando IDE VisualStudioCode.
+
+Para ejecutar en modo debug en VSCode debe ejecutar la aplicación con normalidad desde un terminal. Con la aplicación corriendo, ejecutar el modo debug es tan sencillo como ir al menú Run and Debug y seleccionar en el desplegable que aparece junto al botón Start Debugging la opción correspondiente a nuestro archivo de configuración “attach to Java Debug (port 5005)”. Una vez seleccionado presionamos este botón y el depurador se conectará con nuestra aplicación.

@@ -1,6 +1,6 @@
 /**
 *  This file is part of Healthcare Tasks: Human task management in healthcare contexts.
-*  Copyright (C) 2024  Universidad de Sevilla/Departamento de Ingeniería Telemática
+*  Copyright (C) 2025  Universidad de Sevilla/Departamento de Ingeniería Telemática
 *
 *  Healthcare Tasks is free software: you can redistribute it and/or
 *  modify it under the terms of the GNU General Public License as published
