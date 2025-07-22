@@ -10,3 +10,5 @@ Los procesos principales son:
 * TareaARoleMedia: una instancia de este proceso crea una tarea humana con prioridad media para cualquier usuario con el rol wbadmin
 * TareaARoleUrgente: una instancia de este proceso crea una tarea humana con prioridad urgente para cualquier usuario con el rol wbadmin
 * TareaAUsuario: una instancia de este proceso crea una tarea humana asignada al usuario que se pasa como parámetro de entrada
+
+Estos procesos contienen temporizadores que finalizarán el proceso si no se ha completado antes de que se cumpla la fecha de expiración de la tarea humana.
