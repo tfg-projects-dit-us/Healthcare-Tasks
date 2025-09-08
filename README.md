@@ -22,21 +22,35 @@ Está desarrollado en el Departamento de Ingeniería Telemática de la Universid
 
 Este proyecto está licenciado bajo los términos de la [Licencia Pública General de GNU (GPL) versión 3](https://www.gnu.org/licenses/gpl-3.0.html).
 
+Este proyecto utiliza las siguientes bibliotecas de terceros:
+
+- jBPM (Apache 2.0) - https://www.jbpm.org/
+- HAPI FHIR (Apache 2.0) - https://github.com/hapifhir/hapi-fhir
+
+Cada una de estas librerías mantiene su propia licencia y términos de uso.
+
 
 ## License
 
 This project is licensed under the terms of the [GNU General Public License (GPL) version 3](https://www.gnu.org/licenses/gpl-3.0.html).
+
+This project uses the following third-party libraries:
+
+- jBPM (Apache 2.0) - https://www.jbpm.org/
+- HAPI FHIR (Apache 2.0) - https://github.com/hapifhir/hapi-fhir
+
+Each of these libraries maintains its own license and terms of use.
 
 ## Reconocimientos
 
 Este proyecto es el resultado del trabajo desarrollado por los alumnos que a continuación se mencionan, bajo la supervisión de la profesora Isabel Román Martínez.
 
 **Autores:**
-- Marco Antonio Madonado Orozco: desarrolladoor en su TFG la primera versión del proyecto
-- Juan Manuel Ostos Rabadán: desarrolladoor en su TFG de la versión actual del proyecto
+- [Marco Antonio Maldonado Orozco](https://github.com/mamaldonado97): desarrollada en su TFG la primera versión del proyecto
+- [Juan Manuel Ostos Rabadán](https://github.com/juaostrab): desarrolla en su TFG la versión V.2.0.0 del proyecto
 
 **Supervisora:**
-- Isabel Román Martínez, Profesora del Departamento de Ingeniería Telemática de la Universidad de Sevilla
+- [Isabel Román Martínez](https://github.com/Isabel-Roman), Profesora del Departamento de Ingeniería Telemática de la Universidad de Sevilla
 
 La supervisión incluye la generación de ideas, la corrección, el desarrollo de algunos componentes y la orientación técnica durante todo el proceso de desarrollo.
 
