@@ -47,7 +47,7 @@ Este proyecto es el resultado del trabajo desarrollado por los alumnos que a con
 
 **Autores:**
 - [Marco Antonio Maldonado Orozco](https://github.com/mamaldonado97): desarrollada en su TFG la primera versión del proyecto
-- [Juan Manuel Ostos Rabadán](https://github.com/juaostrab): desarrolla en su TFG la versión V.2.0.0 del proyecto
+- [Juan Manuel Ostos Rabadán](https://github.com/juaostrab): desarrolla en su TFG la versión V.1.2.0 del proyecto
 
 **Supervisora:**
 - [Isabel Román Martínez](https://github.com/Isabel-Roman), Profesora del Departamento de Ingeniería Telemática de la Universidad de Sevilla
